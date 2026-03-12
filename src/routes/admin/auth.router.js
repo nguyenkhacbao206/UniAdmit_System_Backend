@@ -19,6 +19,11 @@ authRouter.post(
     asyncHandler(authController.logout)
 )
 
+authRouter.post(
+    '/refresh-token',
+    asyncHandler(authController.refreshToken)
+)
+
 authRouter.get(
     '/me',
     asyncHandler(authMiddleware.checkValidToken),

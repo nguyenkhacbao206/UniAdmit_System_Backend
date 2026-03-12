@@ -25,4 +25,20 @@ authRouter.post(
     asyncHandler(authController.logout)
 )
 
+authRouter.post(
+    '/refresh-token',
+    asyncHandler(authController.refreshToken)
+)
+
+authRouter.get(
+    '/google',
+    asyncHandler(authController.googleAuth)
+)
+
+authRouter.get(
+    '/google/callback',
+    asyncHandler(authController.googleCallback)
+)
+
 export default authRouter 
+ 

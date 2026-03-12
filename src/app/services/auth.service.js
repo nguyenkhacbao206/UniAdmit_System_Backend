@@ -1,8 +1,8 @@
-import moment from 'moment'
 import jwt from 'jsonwebtoken'
-import {cache, LOGIN_EXPIRE_IN, TOKEN_TYPE, VALIDATE_EMAIL_REGEX} from '@/configs'
-import {abort, generateToken} from '@/utils/helpers'
+import {cache, ACCESS_TOKEN_EXPIRE_IN, REFRESH_TOKEN_EXPIRE_IN, TOKEN_TYPE, VALIDATE_EMAIL_REGEX} from '@/configs'
+import {abort, generateToken, verifyToken} from '@/utils/helpers'
 import {Admin, Permission, STATUS_ACCOUNT, User} from '@/models'
+import moment from 'moment'
 
 export const tokenBlocklist = cache.create('token-block-list')
 
@@ -23,11 +23,15 @@ export async function checkValidLoginAdmin({phone, password}) {
 }
 
 export function authToken(admin) {
-    const accessToken = generateToken({adminId: admin._id}, TOKEN_TYPE.ADMIN_AUTHORIZATION, LOGIN_EXPIRE_IN)
+    const accessToken = generateToken({adminId: admin._id}, TOKEN_TYPE.ADMIN_AUTHORIZATION, ACCESS_TOKEN_EXPIRE_IN)
+    const refreshToken = generateToken({adminId: admin._id}, TOKEN_TYPE.ADMIN_REFRESH_TOKEN, REFRESH_TOKEN_EXPIRE_IN)
+    
     const decode = jwt.decode(accessToken)
     const expireIn = decode.exp - decode.iat
+    
     return {
         access_token: accessToken,
+        refresh_token: refreshToken,
         expire_in: expireIn,
         auth_type: 'Bearer Token',
     }
@@ -47,14 +51,9 @@ export async function profileAdmin(currentAdmin) {
     return acc
 }
 
-export async function checkValidLoginUser({username, password}) {
-    // Tìm user theo phone hoặc email
-    const user = await User.findOne({
-        $or: [
-            { phone: username, deleted: false },
-            { email: username, deleted: false }
-        ]
-    })
+export async function checkValidLoginUser({email, password}) {
+    // Tìm user theo email
+    const user = await User.findOne({ email, deleted: false })
 
     if (user) {
         const verified = user.verifyPassword(password)
@@ -70,15 +69,50 @@ export async function checkValidLoginUser({username, password}) {
 }
 
 export function authTokenUser(user) {
-    const accessToken = generateToken({userId: user._id}, TOKEN_TYPE.USER_AUTHORIZATION, LOGIN_EXPIRE_IN)
+    const accessToken = generateToken({userId: user._id}, TOKEN_TYPE.USER_AUTHORIZATION, ACCESS_TOKEN_EXPIRE_IN)
+    const refreshToken = generateToken({userId: user._id}, TOKEN_TYPE.USER_REFRESH_TOKEN, REFRESH_TOKEN_EXPIRE_IN)
+    
     const decode = jwt.decode(accessToken)
     const expireIn = decode.exp - decode.iat
+    
     return {
         access_token: accessToken,
+        refresh_token: refreshToken,
         expire_in: expireIn,
         auth_type: 'Bearer Token',
     }
 }
+
+export async function refreshUserToken(refreshToken) {
+    try {
+        const decoded = verifyToken(refreshToken, TOKEN_TYPE.USER_REFRESH_TOKEN)
+        const user = await User.findOne({_id: decoded.userId, deleted: false})
+
+        if (!user || user.status === STATUS_ACCOUNT.DE_ACTIVE) {
+            abort(401, 'Token không hợp lệ hoặc tài khoản đã bị khóa.')
+        }
+
+        return authTokenUser(user)
+    } catch (e) {
+        abort(401, 'Refresh token không hợp lệ hoặc đã hết hạn.')
+    }
+}
+
+export async function refreshAdminToken(refreshToken) {
+    try {
+        const decoded = verifyToken(refreshToken, TOKEN_TYPE.ADMIN_REFRESH_TOKEN)
+        const admin = await Admin.findOne({_id: decoded.adminId, deleted: false})
+
+        if (!admin || admin.status === STATUS_ACCOUNT.DE_ACTIVE) {
+            abort(401, 'Token không hợp lệ hoặc tài khoản đã bị khóa.')
+        }
+
+        return authToken(admin)
+    } catch (e) {
+        abort(401, 'Refresh token không hợp lệ hoặc đã hết hạn.')
+    }
+}
+
 
 export async function blockToken(token) {
     const decoded = jwt.decode(token)
@@ -88,30 +122,49 @@ export async function blockToken(token) {
 }
 
 export async function registerUser(userData) {
-    // Xác định username là email hay phone
-    const isEmail = VALIDATE_EMAIL_REGEX.test(userData.username)
+    const {email, phone, name, password} = userData
     
-    // Kiểm tra email/phone đã tồn tại chưa
-    if (isEmail) {
-        const existingEmail = await User.findOne({ email: userData.username, deleted: false })
-        if (existingEmail) {
-            abort(400, 'Email đã được sử dụng.')
-        }
-        // Gán giá trị cho email và để phone là rỗng
-        userData.email = userData.username
-        userData.phone = ''
-    } else {
-        const existingPhone = await User.findOne({ phone: userData.username, deleted: false })
-        if (existingPhone) {
-            abort(400, 'Số điện thoại đã được sử dụng.')
-        }
-        // Gán giá trị cho phone và để email là rỗng
-        userData.phone = userData.username
-        userData.email = ''
+    // Kiểm tra email đã tồn tại chưa
+    const existingEmail = await User.findOne({ email, deleted: false })
+    if (existingEmail) {
+        abort(400, 'Email đã được sử dụng.')
+    }
+    
+    // Kiểm tra số điện thoại đã tồn tại chưa
+    const existingPhone = await User.findOne({ phone, deleted: false })
+    if (existingPhone) {
+        abort(400, 'Số điện thoại đã được sử dụng.')
     }
     
     // Tạo user mới
-    const user = await User.create(userData)
+    const user = await User.create({
+        name,
+        email,
+        phone,
+        password,
+        status: STATUS_ACCOUNT.ACTIVE
+    })
         
+    return user
+}
+
+export async function findOrCreateUserByGoogle(profile) {
+    let user = await User.findOne({email: profile.email, deleted: false})
+
+    if (!user) {
+        user = await User.create({
+            email: profile.email,
+            name: profile.name,
+            avatar: profile.picture,
+            status: STATUS_ACCOUNT.ACTIVE,
+            password: Math.random().toString(36).slice(-10), // Mật khẩu ngẫu nhiên cho social login
+            phone: '',
+        })
+    }
+
+    if (user.status === STATUS_ACCOUNT.DE_ACTIVE) {
+        abort(400, 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản lý.')
+    }
+
     return user
 }
