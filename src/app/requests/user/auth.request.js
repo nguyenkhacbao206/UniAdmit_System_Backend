@@ -30,3 +30,11 @@ export const register = Joi.object({
         .messages({'any.only': '{{#label}} không khớp'}),
 })
 
+export const verifyOTP = Joi.object({
+    email: Joi.string()
+        .pattern(VALIDATE_EMAIL_REGEX)
+        .required()
+        .label('Email'),
+    otp: Joi.string().length(6).required().label('Mã xác thực'),
+})
+

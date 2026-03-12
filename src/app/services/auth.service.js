@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import {cache, ACCESS_TOKEN_EXPIRE_IN, REFRESH_TOKEN_EXPIRE_IN, TOKEN_TYPE, VALIDATE_EMAIL_REGEX} from '@/configs'
+import {cache, ACCESS_TOKEN_EXPIRE_IN, REFRESH_TOKEN_EXPIRE_IN, TOKEN_TYPE} from '@/configs'
 import {abort, generateToken, verifyToken} from '@/utils/helpers'
 import {Admin, Permission, STATUS_ACCOUNT, User} from '@/models'
 import moment from 'moment'
@@ -58,6 +58,9 @@ export async function checkValidLoginUser({email, password}) {
     if (user) {
         const verified = user.verifyPassword(password)
         if (verified) {
+            if (user.status === STATUS_ACCOUNT.UNVERIFIED) {
+                abort(400, 'Tài khoản chưa được xác thực. Vui lòng kiểm tra email.')
+            }
             if (user.status === STATUS_ACCOUNT.DE_ACTIVE) {
                 abort(400, 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản lý.')
             }
@@ -121,6 +124,17 @@ export async function blockToken(token) {
     await tokenBlocklist.set(token, 1, expiresIn - now)
 }
 
+export async function updateOTP(user) {
+    const otp = Math.floor(100000 + Math.random() * 900000).toString()
+    const otp_expired_at = moment().add(10, 'minutes').toDate()
+    
+    user.otp = otp
+    user.otp_expired_at = otp_expired_at
+    await user.save()
+    
+    return user
+}
+
 export async function registerUser(userData) {
     const {email, phone, name, password} = userData
     
@@ -135,6 +149,10 @@ export async function registerUser(userData) {
     if (existingPhone) {
         abort(400, 'Số điện thoại đã được sử dụng.')
     }
+
+    // Tạo OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString()
+    const otp_expired_at = moment().add(10, 'minutes').toDate()
     
     // Tạo user mới
     const user = await User.create({
@@ -142,9 +160,41 @@ export async function registerUser(userData) {
         email,
         phone,
         password,
-        status: STATUS_ACCOUNT.ACTIVE
+        status: STATUS_ACCOUNT.UNVERIFIED,
+        otp,
+        otp_expired_at
     })
         
+    return user
+}
+
+export async function verifyOTP({email, otp}, checkUnverified = true) {
+    const user = await User.findOne({email, deleted: false})
+
+    if (!user) {
+        abort(400, 'Email không tồn tại.')
+    }
+
+    if (checkUnverified && user.status === STATUS_ACCOUNT.ACTIVE) {
+        abort(400, 'Tài khoản đã được xác thực trước đó.')
+    }
+
+    if (user.otp !== otp) {
+        abort(400, 'Mã xác thực không chính xác.')
+    }
+
+    if (moment().isAfter(user.otp_expired_at)) {
+        abort(400, 'Mã xác thực đã hết hạn.')
+    }
+
+    if (user.status === STATUS_ACCOUNT.UNVERIFIED) {
+        user.status = STATUS_ACCOUNT.ACTIVE
+    }
+    
+    user.otp = ''
+    user.otp_expired_at = null
+    await user.save()
+
     return user
 }
 

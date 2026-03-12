@@ -31,7 +31,14 @@ export function jsonify(data, message) {
 
 export function sendMail(to, subject, template, data, mailOptions) {
     ejs.renderFile(path.join(VIEW_DIR, template + '.ejs'), {...this.locals, ...data}, function (err, html) {
-        if (err) throw err
+        if (err) {
+            const detail = normalizeError(err)
+            logger.error({
+                message: 'Error rendering email template: ' + template,
+                detail,
+            })
+            return
+        }
         mailTransporter.sendMail(
             {
                 ...mailOptions,

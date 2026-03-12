@@ -10,9 +10,9 @@ const mongoDb = {
             authSource: DB_AUTH_SOURCE,
             autoCreate: true,
             autoIndex: true,
-            connectTimeoutMS: 5000,
-            socketTimeoutMS: 5000,
-            serverSelectionTimeoutMS: 5000,
+            connectTimeoutMS: 30000,
+            socketTimeoutMS: 30000,
+            serverSelectionTimeoutMS: 30000,
         })
     },
     close(force) {

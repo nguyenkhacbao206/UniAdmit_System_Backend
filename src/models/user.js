@@ -50,7 +50,15 @@ const User = createModel(
             type: String,
             enum: Object.values(STATUS_ACCOUNT),
             required: true,
-            default: STATUS_ACCOUNT.ACTIVE,
+            default: STATUS_ACCOUNT.UNVERIFIED,
+        },
+        otp: {
+            type: String,
+            default: '',
+        },
+        otp_expired_at: {
+            type: Date,
+            default: null,
         },
         deleted: {
             type: Boolean,

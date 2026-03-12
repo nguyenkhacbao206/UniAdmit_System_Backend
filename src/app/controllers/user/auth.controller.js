@@ -1,22 +1,56 @@
 import {google} from 'googleapis'
 import {abort, getToken} from '@/utils/helpers'
-import {GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_CALLBACK_URL, APP_URL_CLIENT} from '@/configs'
+import {GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_CALLBACK_URL, APP_URL_CLIENT, APP_NAME} from '@/configs'
 import * as authService from '@/app/services/auth.service'
 
 export async function login(req, res) {
-    const validLogin = await authService.checkValidLoginUser(req.body)
+    const user = await authService.checkValidLoginUser(req.body)
 
-    if (validLogin) {
-        res.jsonify(authService.authTokenUser(validLogin))
+    if (user) {
+        // Tạo và cập nhật OTP mới cho việc đăng nhập
+        await authService.updateOTP(user)
+
+        // Gửi mail OTP đăng nhập
+        res.sendMail(user.email, `[${APP_NAME}] Xác thực đăng nhập`, 'emails/login-otp', {
+            name: user.name,
+            otp: user.otp,
+            appName: APP_NAME
+        })
+
+        res.jsonify({
+            message: 'Vui lòng kiểm tra email để lấy mã xác thực đăng nhập.',
+            email: user.email
+        })
     } else {
         abort(400, 'Tài khoản hoặc mật khẩu không đúng.')
     }
 }
 
+export async function verifyLoginOTP(req, res) {
+    const user = await authService.verifyOTP(req.body, false) // false vì user đã ACTIVE rồi
+    res.jsonify(authService.authTokenUser(user), 'Đăng nhập thành công.')
+}
+
 export async function register(req, res) {
     const user = await authService.registerUser(req.body)
+
+    // Gửi mail OTP
+    res.sendMail(user.email, `[${APP_NAME}] Mã xác thực tài khoản`, 'emails/verify-otp', {
+        name: user.name,
+        otp: user.otp,
+        appName: APP_NAME
+    })
+
     res.jsonify({
-        message: 'Đăng ký tài khoản thành công',
+        message: 'Đăng ký tài khoản thành công. Vui lòng kiểm tra email để nhận mã xác thực.',
+        user
+    })
+}
+
+export async function verifyOTP(req, res) {
+    const user = await authService.verifyOTP(req.body)
+    res.jsonify({
+        message: 'Xác thực tài khoản thành công. Bạn có thể đăng nhập ngay bây giờ.',
         user
     })
 }
