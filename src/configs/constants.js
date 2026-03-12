@@ -52,8 +52,9 @@ assert(_.isArray(OTHER_URLS_CLIENT), 'OTHER_URLS_CLIENT must be an array.')
 export const SECRET_KEY = process.env.SECRET_KEY
 assert(!_.isEmpty(SECRET_KEY), assertMsg('SECRET_KEY'))
 
-export const LOGIN_EXPIRE_IN = process.env.LOGIN_EXPIRE_IN
-assert(!_.isEmpty(LOGIN_EXPIRE_IN), assertMsg('LOGIN_EXPIRE_IN'))
+export const ACCESS_TOKEN_EXPIRE_IN = process.env.ACCESS_TOKEN_EXPIRE_IN || '15m'
+
+export const REFRESH_TOKEN_EXPIRE_IN = process.env.REFRESH_TOKEN_EXPIRE_IN || '30d'
 
 export const REQUESTS_LIMIT_PER_MINUTE = parseInt(process.env.REQUESTS_LIMIT_PER_MINUTE, 10) || 1000
 
@@ -86,10 +87,20 @@ assert(!_.isEmpty(MAIL_PORT), assertMsg('MAIL_PORT'))
 assert(!_.isEmpty(MAIL_USERNAME), assertMsg('MAIL_USERNAME'))
 assert(!_.isEmpty(MAIL_PASSWORD), assertMsg('MAIL_PASSWORD'))
 
+// Google OAuth2
+export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID
+export const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET
+export const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL
+assert(!_.isEmpty(GOOGLE_CLIENT_ID), assertMsg('GOOGLE_CLIENT_ID'))
+assert(!_.isEmpty(GOOGLE_CLIENT_SECRET), assertMsg('GOOGLE_CLIENT_SECRET'))
+assert(!_.isEmpty(GOOGLE_CALLBACK_URL), assertMsg('GOOGLE_CALLBACK_URL'))
+
 // other
 export const TOKEN_TYPE = {
     USER_AUTHORIZATION: 'USER_AUTHORIZATION',
+    USER_REFRESH_TOKEN: 'USER_REFRESH_TOKEN',
     ADMIN_AUTHORIZATION: 'ADMIN_AUTHORIZATION',
+    ADMIN_REFRESH_TOKEN: 'ADMIN_REFRESH_TOKEN',
 }
 export const MAX_STRING_SIZE = 255
 
