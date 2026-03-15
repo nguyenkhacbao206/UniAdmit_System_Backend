@@ -12,38 +12,33 @@ const authRouter = Router()
  * /user/auth/register:
  *   post:
  *     tags: [User Auth]
- *     summary: User Register
+ *     summary: Đăng ký tài khoản người dùng
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - name
- *               - email
- *               - phone
- *               - password
- *               - password_confirmation
+ *             required: [name, email, phone, password, password_confirmation]
  *             properties:
- *               name:
- *                 type: string
- *                 example: "Nguyen Van A"
- *               email:
- *                 type: string
- *                 example: "user@example.com"
- *               phone:
- *                 type: string
- *                 example: "0912345678"
- *               password:
- *                 type: string
- *                 example: "Password123!"
- *               password_confirmation:
- *                 type: string
- *                 example: "Password123!"
+ *               name: { type: string, example: "Nguyễn Văn A" }
+ *               email: { type: string, example: "user@example.com" }
+ *               phone: { type: string, example: "0912345678" }
+ *               password: { type: string, minLength: 6, example: "Abc123456!" }
+ *               password_confirmation: { type: string, example: "Abc123456!" }
  *     responses:
  *       200:
- *         description: Register successful. OTP sent to email.
+ *         description: Đăng ký thành công. Hệ thống đã gửi mã OTP xác thực vào email.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ *       400:
+ *         description: Lỗi dữ liệu đầu vào hoặc Email/Phone đã tồn tại.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 authRouter.post(
     '/register',
@@ -56,24 +51,23 @@ authRouter.post(
  * /user/auth/login:
  *   post:
  *     tags: [User Auth]
- *     summary: User Login
+ *     summary: Đăng nhập bằng Email/Mật khẩu
+ *     description: Sau khi gọi API này thành công, hệ thống sẽ gửi một mã OTP qua Email để hoàn tất đăng nhập.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - email
- *               - password
+ *             required: [email, password]
  *             properties:
- *               email:
- *                 type: string
- *               password:
- *                 type: string
+ *               email: { type: string, example: "user@example.com" }
+ *               password: { type: string, example: "Abc123456!" }
  *     responses:
  *       200:
- *         description: Login successful
+ *         description: Đăng nhập bước 1 thành công. Vui lòng gọi API verify-login-otp.
+ *       400:
+ *         description: Email hoặc mật khẩu không chính xác.
  */
 authRouter.post(
     '/login',
@@ -86,24 +80,29 @@ authRouter.post(
  * /user/auth/verify-login-otp:
  *   post:
  *     tags: [User Auth]
- *     summary: User Verify Login OTP
+ *     summary: Xác thực OTP để hoàn tất đăng nhập
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - email
- *               - otp
+ *             required: [email, otp]
  *             properties:
- *               email:
- *                 type: string
- *               otp:
- *                 type: string
+ *               email: { type: string, example: "user@example.com" }
+ *               otp: { type: string, example: "123456" }
  *     responses:
  *       200:
- *         description: Login successful
+ *         description: Đăng nhập thành công. Trả về Token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status: { type: integer, example: 200 }
+ *                 success: { type: boolean, example: true }
+ *                 data: { $ref: '#/components/schemas/AuthToken' }
+ *                 message: { type: string }
  */
 authRouter.post(
     '/verify-login-otp',
@@ -116,24 +115,20 @@ authRouter.post(
  * /user/auth/verify-otp:
  *   post:
  *     tags: [User Auth]
- *     summary: User Verify Account OTP
+ *     summary: Xác thực OTP để kích hoạt tài khoản mới đăng ký
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - email
- *               - otp
+ *             required: [email, otp]
  *             properties:
- *               email:
- *                 type: string
- *               otp:
- *                 type: string
+ *               email: { type: string, example: "user@example.com" }
+ *               otp: { type: string, example: "123456" }
  *     responses:
  *       200:
- *         description: OTP verified
+ *         description: Tài khoản đã được kích hoạt thành công.
  */
 authRouter.post(
     '/verify-otp',
@@ -146,21 +141,19 @@ authRouter.post(
  * /user/auth/resend-otp:
  *   post:
  *     tags: [User Auth]
- *     summary: User Resend OTP
+ *     summary: Gửi lại mã OTP
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - email
+ *             required: [email]
  *             properties:
- *               email:
- *                 type: string
+ *               email: { type: string, example: "user@example.com" }
  *     responses:
  *       200:
- *         description: OTP resent
+ *         description: Mã OTP mới đã được gửi vào Email.
  */
 authRouter.post(
     '/resend-otp',
@@ -173,12 +166,14 @@ authRouter.post(
  * /user/auth/logout:
  *   post:
  *     tags: [User Auth]
- *     summary: User Logout
+ *     summary: Đăng xuất tài khoản
  *     security:
  *       - BearerAuth: []
  *     responses:
  *       200:
- *         description: Logout successful
+ *         description: Đăng xuất thành công. Token đã được vô hiệu hóa.
+ *       401:
+ *         description: Token không hợp lệ hoặc đã hết hạn.
  */
 authRouter.post(
     '/logout',
@@ -191,21 +186,23 @@ authRouter.post(
  * /user/auth/refresh-token:
  *   post:
  *     tags: [User Auth]
- *     summary: User Refresh Token
+ *     summary: Làm mới Access Token
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - refresh_token
+ *             required: [refresh_token]
  *             properties:
- *               refresh_token:
- *                 type: string
+ *               refresh_token: { type: string }
  *     responses:
  *       200:
- *         description: Token refreshed
+ *         description: Cấp Token mới thành công.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               data: { $ref: '#/components/schemas/AuthToken' }
  */
 authRouter.post(
     '/refresh-token',
