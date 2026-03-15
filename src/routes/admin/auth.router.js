@@ -12,26 +12,27 @@ const authRouter = Router()
  * /admin/auth/login:
  *   post:
  *     tags: [Admin Auth]
- *     summary: Admin Login
+ *     summary: Đăng nhập quản trị viên (Admin)
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - email
- *               - phone
- *               - password
+ *             required: [phone, password]
  *             properties:
- *               email:
- *               phone:
- *                 type: string
- *               password:
- *                 type: string
+ *               phone: { type: string, example: "0987654321" }
+ *               password: { type: string, example: "123456" }
  *     responses:
  *       200:
- *         description: Login successful
+ *         description: Đăng nhập thành công. Trả về Token Admin.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 data: { $ref: '#/components/schemas/AuthToken' }
+ *       400:
+ *         description: Số điện thoại hoặc mật khẩu không đúng.
  */
 authRouter.post(
     '/login',
@@ -44,12 +45,12 @@ authRouter.post(
  * /admin/auth/logout:
  *   post:
  *     tags: [Admin Auth]
- *     summary: Admin Logout
+ *     summary: Đăng xuất quản trị viên
  *     security:
  *       - BearerAuth: []
  *     responses:
  *       200:
- *         description: Logout successful
+ *         description: Đăng xuất thành công.
  */
 authRouter.post(
     '/logout',
@@ -62,21 +63,19 @@ authRouter.post(
  * /admin/auth/refresh-token:
  *   post:
  *     tags: [Admin Auth]
- *     summary: Admin Refresh Token
+ *     summary: Làm mới Access Token cho Admin
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - refresh_token
+ *             required: [refresh_token]
  *             properties:
- *               refresh_token:
- *                 type: string
+ *               refresh_token: { type: string }
  *     responses:
  *       200:
- *         description: Token refreshed
+ *         description: Cấp Token mới thành công.
  */
 authRouter.post(
     '/refresh-token',
@@ -88,12 +87,17 @@ authRouter.post(
  * /admin/auth/me:
  *   get:
  *     tags: [Admin Auth]
- *     summary: Get Current Admin Profile
+ *     summary: Lấy thông tin tài khoản Admin hiện tại
  *     security:
  *       - BearerAuth: []
  *     responses:
  *       200:
- *         description: Admin profile data
+ *         description: Trả về thông tin chi tiết Admin và các quyền (Permissions).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 data: { $ref: '#/components/schemas/Admin' }
  */
 authRouter.get(
     '/me',
