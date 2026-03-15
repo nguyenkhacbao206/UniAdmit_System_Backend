@@ -68,6 +68,21 @@ const Profile = createModel(
         cv: {
             type: String,
             default: '',
+        },
+
+        school: {
+            type: String,
+            default: '',
+        },
+
+        score: {
+            type: Number,
+            default: 0,
+        },
+
+        rank: {
+            type: String,
+            default: '',
         }
     }
 )

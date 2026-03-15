@@ -26,7 +26,7 @@ export async function updateUserProfile(userId, profileData) {
     await user.save()
 
     // Update thông tin chi tiết ở Profile
-    const profileFields = ['ethnicity', 'gender', 'dob', 'permanentAddress', 'contactAddress', 'cccd', 'place_of_issue', 'avatar', 'cv']
+    const profileFields = ['ethnicity', 'gender', 'dob', 'permanentAddress', 'contactAddress', 'cccd', 'place_of_issue', 'avatar', 'cv', 'school', 'score', 'rank']
     const detailData = _.omitBy(_.pick(profileData, profileFields), _.isNil)
     
     let profile = await Profile.findOne({ user_id: userId })

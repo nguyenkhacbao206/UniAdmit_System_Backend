@@ -28,12 +28,7 @@ router.use(asyncHandler(checkValidToken))
  *               properties:
  *                 status: { type: integer, example: 200 }
  *                 success: { type: boolean, example: true }
- *                 data:
- *                   allOf:
- *                     - $ref: '#/components/schemas/User'
- *                     - type: object
- *                       properties:
- *                         profile: { $ref: '#/components/schemas/ProfileDetail' }
+ *                 data: { $ref: '#/components/schemas/UserWithProfile' }
  *       401:
  *         description: Token không hợp lệ hoặc đã hết hạn.
  *         content:
@@ -71,6 +66,9 @@ router.get('/', asyncHandler(profileController.getProfile))
  *               place_of_issue: { type: string, example: "Cục Cảnh sát QLHC về TTXH" }
  *               avatar: { type: string, format: binary, description: "Ảnh đại diện (File)" }
  *               cv: { type: string, format: binary, description: "Hồ sơ năng lực (File PDF/Word)" }
+ *               school: { type: string, example: "Trường Đại học Bách Khoa" }
+ *               score: { type: number, example: 8.5 }
+ *               rank: { type: string, example: "Giỏi" }
  *         application/json:
  *           schema:
  *             type: object
@@ -85,6 +83,9 @@ router.get('/', asyncHandler(profileController.getProfile))
  *               contactAddress: { type: string, example: "Địa chỉ liên lạc" }
  *               cccd: { type: string, example: "031095001234" }
  *               place_of_issue: { type: string, example: "Cục Cảnh sát QLHC về TTXH" }
+ *               school: { type: string, example: "Trường Đại học Bách Khoa" }
+ *               score: { type: number, example: 8.5 }
+ *               rank: { type: string, example: "Giỏi" }
  *     responses:
  *       200:
  *         description: Cập nhật thành công.
@@ -95,12 +96,7 @@ router.get('/', asyncHandler(profileController.getProfile))
  *               properties:
  *                 status: { type: integer, example: 200 }
  *                 success: { type: boolean, example: true }
- *                 data:
- *                   allOf:
- *                     - $ref: '#/components/schemas/User'
- *                     - type: object
- *                       properties:
- *                         profile: { $ref: '#/components/schemas/ProfileDetail' }
+ *                 data: { $ref: '#/components/schemas/UserWithProfile' }
  *                 message: { type: string, example: "Cập nhật thông tin thành công" }
  *       400:
  *         description: Dữ liệu không hợp lệ (Email/Phone đã tồn tại hoặc sai định dạng).

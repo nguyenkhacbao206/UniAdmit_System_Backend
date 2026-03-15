@@ -83,6 +83,21 @@ export const updateProfile = Joi.object({
 
     cv: Joi.any()
         .allow('')
-        .label('CV')
+        .label('CV'),
+
+    school: Joi.string()
+        .max(200)
+        .allow('')
+        .label('Trường học'),
+
+    score: Joi.number()
+        .min(0)
+        .max(10)
+        .allow(null, 0)
+        .label('Điểm số'),
+
+    rank: Joi.string()
+        .max(50)
+        .allow('')
+        .label('Xếp loại/Học lực')
 }) 
- 
