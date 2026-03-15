@@ -55,6 +55,22 @@ router.get('/', asyncHandler(profileController.getProfile))
  *     requestBody:
  *       required: true
  *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name: { type: string, example: "Nguyễn Văn A" }
+ *               email: { type: string, example: "user@example.com" }
+ *               phone: { type: string, example: "0912345678" }
+ *               gender: { type: string, enum: [male, female, other], example: "male" }
+ *               dob: { type: string, format: date, example: "1995-10-25" }
+ *               ethnicity: { type: string, example: "Kinh" }
+ *               permanentAddress: { type: string, example: "Địa chỉ thường trú" }
+ *               contactAddress: { type: string, example: "Địa chỉ liên lạc" }
+ *               cccd: { type: string, example: "031095001234" }
+ *               place_of_issue: { type: string, example: "Cục Cảnh sát QLHC về TTXH" }
+ *               avatar: { type: string, format: binary, description: "Ảnh đại diện (File)" }
+ *               cv: { type: string, format: binary, description: "Hồ sơ năng lực (File PDF/Word)" }
  *         application/json:
  *           schema:
  *             type: object

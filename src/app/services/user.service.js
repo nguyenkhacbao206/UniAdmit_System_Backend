@@ -9,7 +9,7 @@ export async function updateUserProfile(userId, profileData) {
     }
 
     // Update thông tin cơ bản ở User (nếu có)
-    const userFields = ['name', 'phone', 'email', 'avatar']
+    const userFields = ['name', 'phone', 'email', 'avatar', 'gender', 'dob', 'address']
     const userData = _.omitBy(_.pick(profileData, userFields), _.isNil)
     
     if (userData.email && userData.email !== user.email) {
@@ -39,6 +39,9 @@ export async function updateUserProfile(userId, profileData) {
     profile.name = user.name
     profile.email = user.email
     profile.phone = user.phone
+    profile.avatar = user.avatar
+    profile.gender = user.gender
+    profile.dob = user.dob
     
     await profile.save()
     
