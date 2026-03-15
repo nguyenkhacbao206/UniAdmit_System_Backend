@@ -14,9 +14,21 @@ authRouter.post(
 )
 
 authRouter.post(
+    '/verify-login-otp',
+    asyncHandler(validate(authRequest.verifyOTP)),
+    asyncHandler(authController.verifyLoginOTP)
+)
+
+authRouter.post(
     '/register',
     asyncHandler(validate(authRequest.register)),
     asyncHandler(authController.register)
+)
+
+authRouter.post(
+    '/verify-otp',
+    asyncHandler(validate(authRequest.verifyOTP)),
+    asyncHandler(authController.verifyOTP)
 )
 
 authRouter.post(

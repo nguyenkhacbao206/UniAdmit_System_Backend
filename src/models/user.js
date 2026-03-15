@@ -12,13 +12,13 @@ const User = createModel(
         email: {
             type: String,
             lowercase: true,
-            required: function() {
+            required: function () {
                 return !this.phone
             }
         },
         phone: {
             type: String,
-            required: function() {
+            required: function () {
                 return !this.email
             }
         },
@@ -50,7 +50,15 @@ const User = createModel(
             type: String,
             enum: Object.values(STATUS_ACCOUNT),
             required: true,
-            default: STATUS_ACCOUNT.ACTIVE,
+            default: STATUS_ACCOUNT.UNVERIFIED,
+        },
+        otp: {
+            type: String,
+            default: '',
+        },
+        otp_expired_at: {
+            type: Date,
+            default: null,
         },
         deleted: {
             type: Boolean,
@@ -63,7 +71,7 @@ const User = createModel(
             virtuals: true,
             transform(doc, ret) {
                 // eslint-disable-next-line no-unused-vars
-                const {password, deleted, ...result} = ret
+                const { password, deleted, otp, otp_expired_at, ...result } = ret
                 return result
             },
         },
