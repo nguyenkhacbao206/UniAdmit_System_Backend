@@ -66,8 +66,16 @@ authRouter.post(
  *     responses:
  *       200:
  *         description: Đăng nhập bước 1 thành công. Vui lòng gọi API verify-login-otp.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
  *       400:
  *         description: Email hoặc mật khẩu không chính xác.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 authRouter.post(
     '/login',
@@ -103,6 +111,12 @@ authRouter.post(
  *                 success: { type: boolean, example: true }
  *                 data: { $ref: '#/components/schemas/AuthToken' }
  *                 message: { type: string }
+ *       400:
+ *         description: Mã OTP không chính xác hoặc đã hết hạn.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 authRouter.post(
     '/verify-login-otp',
@@ -129,6 +143,16 @@ authRouter.post(
  *     responses:
  *       200:
  *         description: Tài khoản đã được kích hoạt thành công.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ *       400:
+ *         description: Mã OTP không chính xác hoặc tài khoản đã kích hoạt.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 authRouter.post(
     '/verify-otp',
@@ -154,6 +178,10 @@ authRouter.post(
  *     responses:
  *       200:
  *         description: Mã OTP mới đã được gửi vào Email.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
  */
 authRouter.post(
     '/resend-otp',
@@ -180,6 +208,10 @@ authRouter.post(
  *     responses:
  *       200:
  *         description: Mã OTP quên mật khẩu đã được gửi vào Email.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
  */
 authRouter.post(
     '/forgot-password',
@@ -206,6 +238,10 @@ authRouter.post(
  *     responses:
  *       200:
  *         description: Xác thực OTP thành công.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
  */
 authRouter.post(
     '/verify-forgot-password-otp',
@@ -233,6 +269,10 @@ authRouter.post(
  *     responses:
  *       200:
  *         description: Đặt lại mật khẩu thành công.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
  */
 authRouter.post(
     '/reset-password',

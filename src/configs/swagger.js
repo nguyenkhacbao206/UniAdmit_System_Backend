@@ -58,7 +58,22 @@ const swaggerOptions = {
                         place_of_issue: { type: 'string' },
                         avatar: { type: 'string' },
                         cv: { type: 'string' },
+                        school: { type: 'string' },
+                        score: { type: 'number' },
+                        rank: { type: 'string' },
                     }
+                },
+                UserWithProfile: {
+                    type: 'object',
+                    allOf: [
+                        { $ref: '#/components/schemas/User' },
+                        {
+                            type: 'object',
+                            properties: {
+                                profile: { $ref: '#/components/schemas/ProfileDetail' }
+                            }
+                        }
+                    ]
                 },
                 Admin: {
                     type: 'object',
