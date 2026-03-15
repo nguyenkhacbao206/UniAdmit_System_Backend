@@ -24,10 +24,10 @@ const Admin = createModel(
         },
         dob: {
             type: Date,
-            default: ''
+            default: null
         },
         address: {
-            type: Date,
+            type: String,
             default: ''
         },
         avatar: {

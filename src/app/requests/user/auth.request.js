@@ -38,3 +38,10 @@ export const verifyOTP = Joi.object({
     otp: Joi.string().length(6).required().label('Mã xác thực'),
 })
 
+export const resendOtp = Joi.object({
+    email: Joi.string()
+        .pattern(VALIDATE_EMAIL_REGEX)
+        .required()
+        .label('Email'),
+})
+
