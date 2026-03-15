@@ -72,6 +72,36 @@ export async function resendOtp(req, res) {
     })
 }
 
+export async function forgotPassword(req, res) {
+    const { email } = req.body
+    const user = await authService.resendOTP(email)
+
+    // Gửi mail OTP quên mật khẩu
+    res.sendMail(user.email, `[${APP_NAME}] Xác thực quên mật khẩu`, 'emails/forgot-password-otp', {
+        name: user.name,
+        otp: user.otp,
+        appName: APP_NAME
+    })
+
+    res.jsonify({
+        message: 'Mã xác thực quên mật khẩu đã được gửi vào email của bạn.',
+        email: user.email
+    })
+}
+
+export async function verifyForgotPasswordOTP(req, res) {
+    const user = await authService.verifyOTP(req.body, false)
+    res.jsonify({
+        message: 'Xác thực mã OTP thành công. Vui lòng đặt lại mật khẩu mới.',
+        email: user.email
+    })
+}
+
+export async function resetPassword(req, res) {
+    await authService.resetPassword(req.body)
+    res.jsonify('Đặt lại mật khẩu thành công. Bạn có thể đăng nhập bằng mật khẩu mới.')
+}
+
 export async function logout(req, res) {
     const token = getToken(req.headers)
     await authService.blockToken(token)
