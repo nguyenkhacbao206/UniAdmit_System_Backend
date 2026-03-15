@@ -165,6 +165,21 @@ export async function registerUser(userData) {
     return user
 }
 
+export async function resendOTP(email) {
+    const user = await User.findOne({ email, deleted: false })
+
+    if (!user) {
+        abort(400, 'Email không tồn tại.')
+    }
+
+    if (user.status === STATUS_ACCOUNT.ACTIVE && moment().isAfter(user.otp_expired_at)) {
+        // Nếu đã active và OTP cũ đã hết hạn, có thể đây là resend cho login?
+        // Nhưng thường resend OTP dùng cho cả 2.
+    }
+
+    return await updateOTP(user)
+}
+
 export async function verifyOTP({ email, otp }, checkUnverified = true) {
     const user = await User.findOne({ email, deleted: false })
 

@@ -55,6 +55,23 @@ export async function verifyOTP(req, res) {
     })
 }
 
+export async function resendOtp(req, res) {
+    const { email } = req.body
+    const user = await authService.resendOTP(email)
+
+    // Gửi mail OTP mới
+    res.sendMail(user.email, `[${APP_NAME}] Mã xác thực mới`, 'emails/verify-otp', {
+        name: user.name,
+        otp: user.otp,
+        appName: APP_NAME
+    })
+
+    res.jsonify({
+        message: 'Mã xác thực mới đã được gửi vào email của bạn.',
+        email: user.email
+    })
+}
+
 export async function logout(req, res) {
     const token = getToken(req.headers)
     await authService.blockToken(token)
