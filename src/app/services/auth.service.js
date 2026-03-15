@@ -210,6 +210,22 @@ export async function verifyOTP({ email, otp }, checkUnverified = true) {
     return user
 }
 
+export async function resetPassword({ email, password }) {
+    const user = await User.findOne({ email, deleted: false })
+    if (!user) {
+        abort(404, 'Người dùng không tồn tại.')
+    }
+
+    if (user.status === STATUS_ACCOUNT.DE_ACTIVE) {
+        abort(400, 'Tài khoản đã bị khóa.')
+    }
+
+    user.password = password
+    await user.save()
+
+    return user
+}
+
 export async function findOrCreateUserByGoogle(profile) {
     let user = await User.findOne({ email: profile.email, deleted: false })
 
