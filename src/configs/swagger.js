@@ -45,6 +45,21 @@ const swaggerOptions = {
                         created_at: { type: 'string', format: 'date-time' },
                     }
                 },
+                ProfileDetail: {
+                    type: 'object',
+                    properties: {
+                        _id: { type: 'string' },
+                        ethnicity: { type: 'string' },
+                        gender: { type: 'string' },
+                        dob: { type: 'string', format: 'date' },
+                        permanentAddress: { type: 'string' },
+                        contactAddress: { type: 'string' },
+                        cccd: { type: 'string' },
+                        place_of_issue: { type: 'string' },
+                        avatar: { type: 'string' },
+                        cv: { type: 'string' },
+                    }
+                },
                 Admin: {
                     type: 'object',
                     properties: {
