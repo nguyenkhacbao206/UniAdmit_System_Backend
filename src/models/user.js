@@ -12,13 +12,13 @@ const User = createModel(
         email: {
             type: String,
             lowercase: true,
-            required: function() {
+            required: function () {
                 return !this.phone
             }
         },
         phone: {
             type: String,
-            required: function() {
+            required: function () {
                 return !this.email
             }
         },
@@ -71,7 +71,7 @@ const User = createModel(
             virtuals: true,
             transform(doc, ret) {
                 // eslint-disable-next-line no-unused-vars
-                const {password, deleted, ...result} = ret
+                const { password, deleted, otp, otp_expired_at, ...result } = ret
                 return result
             },
         },

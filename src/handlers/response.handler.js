@@ -42,10 +42,7 @@ export function sendMail(to, subject, template, data, mailOptions) {
         mailTransporter.sendMail(
             {
                 ...mailOptions,
-                from: {
-                    address: MAIL_FROM_ADDRESS,
-                    name: MAIL_FROM_NAME,
-                },
+                from: `"${MAIL_FROM_NAME}" <${MAIL_FROM_ADDRESS}>`,
                 to,
                 subject,
                 html,
