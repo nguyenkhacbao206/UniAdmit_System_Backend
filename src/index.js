@@ -3,7 +3,9 @@ import path from 'path'
 import serveFavicon from 'serve-favicon'
 import helmet from 'helmet'
 import multer from 'multer'
+import swaggerUi from 'swagger-ui-express'
 import {APP_DEBUG, NODE_ENV, PUBLIC_DIR, VIEW_DIR} from './configs'
+import swaggerSpec from './configs/swagger.js'
 
 import {jsonify, sendMail} from './handlers/response.handler'
 import corsHandler from './handlers/cors.handler'
@@ -35,12 +37,17 @@ function createApp() {
     app.use(serveFavicon(path.join(PUBLIC_DIR, 'favicon.ico')))
     app.use('/static', express.static(PUBLIC_DIR))
     app.use(limiter)
-    app.use(helmet())
+    app.use(helmet({
+        contentSecurityPolicy: false,
+    }))
     app.use(express.json())
     app.use(express.urlencoded({extended: true}))
     app.use(multer({storage: multer.memoryStorage()}).any())
     app.use(formDataHandler)
     app.use(initLocalsHandler)
+
+    // Swagger
+    app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
     route(app)
 

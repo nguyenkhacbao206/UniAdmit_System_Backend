@@ -42,17 +42,62 @@ export const updateProfile = Joi.object({
     gender: Joi.string()
         .valid('male', 'female', 'other', '')
         .label('Giới tính'),
-    
+
     dob: Joi.date()
         .allow(null, '')
         .label('Ngày sinh'),
-    
+
     address: Joi.string()
         .max(200)
         .allow('')
         .label('Địa chỉ'),
-    
-    avatar: Joi.string()
+
+    ethnicity: Joi.string()
+        .max(50)
         .allow('')
-        .label('Ảnh đại diện')
+        .label('Dân tộc'),
+
+    permanentAddress: Joi.string()
+        .max(200)
+        .allow('')
+        .label('Địa chỉ thường trú'),
+
+    contactAddress: Joi.string()
+        .max(200)
+        .allow('')
+        .label('Địa chỉ liên lạc'),
+
+    cccd: Joi.string()
+        .max(20)
+        .allow('')
+        .label('Số CCCD/CMND'),
+
+    place_of_issue: Joi.string()
+        .max(100)
+        .allow('')
+        .label('Nơi cấp'),
+
+    avatar: Joi.any()
+        .allow('')
+        .label('Ảnh đại diện'),
+
+    cv: Joi.any()
+        .allow('')
+        .label('CV'),
+
+    school: Joi.string()
+        .max(200)
+        .allow('')
+        .label('Trường học'),
+
+    score: Joi.number()
+        .min(0)
+        .max(10)
+        .allow(null, 0)
+        .label('Điểm số'),
+
+    rank: Joi.string()
+        .max(50)
+        .allow('')
+        .label('Xếp loại/Học lực')
 }) 

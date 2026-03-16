@@ -21,3 +21,12 @@ export async function me(req, res) {
     const result = await authService.profileAdmin(req.currentAdmin)
     res.jsonify(result)
 }
+
+export async function refreshToken(req, res) {
+    const {refresh_token} = req.body
+    if (!refresh_token) {
+        abort(400, 'Refresh token không được bỏ trống.')
+    }
+    const tokenData = await authService.refreshAdminToken(refresh_token)
+    res.jsonify(tokenData)
+}

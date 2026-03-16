@@ -52,8 +52,9 @@ assert(_.isArray(OTHER_URLS_CLIENT), 'OTHER_URLS_CLIENT must be an array.')
 export const SECRET_KEY = process.env.SECRET_KEY
 assert(!_.isEmpty(SECRET_KEY), assertMsg('SECRET_KEY'))
 
-export const LOGIN_EXPIRE_IN = process.env.LOGIN_EXPIRE_IN
-assert(!_.isEmpty(LOGIN_EXPIRE_IN), assertMsg('LOGIN_EXPIRE_IN'))
+export const ACCESS_TOKEN_EXPIRE_IN = process.env.ACCESS_TOKEN_EXPIRE_IN || '15m'
+
+export const REFRESH_TOKEN_EXPIRE_IN = process.env.REFRESH_TOKEN_EXPIRE_IN || '30d'
 
 export const REQUESTS_LIMIT_PER_MINUTE = parseInt(process.env.REQUESTS_LIMIT_PER_MINUTE, 10) || 1000
 
@@ -76,20 +77,32 @@ export const DB_AUTH_SOURCE = process.env.DB_AUTH_SOURCE
 
 export const MAIL_HOST = process.env.MAIL_HOST
 export const MAIL_PORT = process.env.MAIL_PORT
-export const MAIL_SECURE = process.env.MAIL_SECURE === 'true'
+// Tự động xác định secure: 465 là true (SSL), còn lại (587) là false (STARTTLS)
+export const MAIL_SECURE = Number(MAIL_PORT) === 465
 export const MAIL_USERNAME = process.env.MAIL_USERNAME
-export const MAIL_PASSWORD = process.env.MAIL_PASSWORD
+export const MAIL_PASSWORD = (process.env.MAIL_PASSWORD || '').replace(/\s+/g, '')
 export const MAIL_FROM_ADDRESS = process.env.MAIL_FROM_ADDRESS || MAIL_USERNAME
 export const MAIL_FROM_NAME = process.env.MAIL_FROM_NAME || APP_NAME
+
 assert(!_.isEmpty(MAIL_HOST), assertMsg('MAIL_HOST'))
 assert(!_.isEmpty(MAIL_PORT), assertMsg('MAIL_PORT'))
 assert(!_.isEmpty(MAIL_USERNAME), assertMsg('MAIL_USERNAME'))
 assert(!_.isEmpty(MAIL_PASSWORD), assertMsg('MAIL_PASSWORD'))
 
+// Google OAuth2
+export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID
+export const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET
+export const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL
+assert(!_.isEmpty(GOOGLE_CLIENT_ID), assertMsg('GOOGLE_CLIENT_ID'))
+assert(!_.isEmpty(GOOGLE_CLIENT_SECRET), assertMsg('GOOGLE_CLIENT_SECRET'))
+assert(!_.isEmpty(GOOGLE_CALLBACK_URL), assertMsg('GOOGLE_CALLBACK_URL'))
+
 // other
 export const TOKEN_TYPE = {
     USER_AUTHORIZATION: 'USER_AUTHORIZATION',
+    USER_REFRESH_TOKEN: 'USER_REFRESH_TOKEN',
     ADMIN_AUTHORIZATION: 'ADMIN_AUTHORIZATION',
+    ADMIN_REFRESH_TOKEN: 'ADMIN_REFRESH_TOKEN',
 }
 export const MAX_STRING_SIZE = 255
 

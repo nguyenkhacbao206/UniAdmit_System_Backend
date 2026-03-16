@@ -44,6 +44,7 @@ export const USER_ROLE = {
 export const STATUS_ACCOUNT = {
     ACTIVE: 'ACTIVE',
     DE_ACTIVE: 'DE_ACTIVE',
+    UNVERIFIED: 'UNVERIFIED',
 }
 
 export const EVENT_TYPE = {

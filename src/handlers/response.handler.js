@@ -31,14 +31,18 @@ export function jsonify(data, message) {
 
 export function sendMail(to, subject, template, data, mailOptions) {
     ejs.renderFile(path.join(VIEW_DIR, template + '.ejs'), {...this.locals, ...data}, function (err, html) {
-        if (err) throw err
+        if (err) {
+            const detail = normalizeError(err)
+            logger.error({
+                message: 'Error rendering email template: ' + template,
+                detail,
+            })
+            return
+        }
         mailTransporter.sendMail(
             {
                 ...mailOptions,
-                from: {
-                    address: MAIL_FROM_ADDRESS,
-                    name: MAIL_FROM_NAME,
-                },
+                from: `"${MAIL_FROM_NAME}" <${MAIL_FROM_ADDRESS}>`,
                 to,
                 subject,
                 html,
