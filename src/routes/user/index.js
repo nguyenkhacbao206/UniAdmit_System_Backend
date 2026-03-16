@@ -1,7 +1,7 @@
 import {Router} from 'express'
 import authRouter from './auth.router'
-import profileRouter from './profile.route'
-import scoreRouter from './score.route'
+import profileRouter from './profile.router'
+import scoreRouter from './score.router'
 
 const user = Router()
 
