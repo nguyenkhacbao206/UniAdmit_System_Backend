@@ -21,6 +21,15 @@ router.use(asyncHandler(checkValidToken))
  *     responses:
  *       200:
  *         description: Trả về bảng điểm thành công.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/SuccessResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       $ref: '#/components/schemas/Score'
  */
 router.get('/', asyncHandler(scoreController.getMyScore))
 
@@ -51,6 +60,15 @@ router.get('/', asyncHandler(scoreController.getMyScore))
  *     responses:
  *       200:
  *         description: Cập nhật thành công.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/SuccessResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       $ref: '#/components/schemas/Score'
  */
 router.put('/', 
     asyncHandler(validate(scoreRequest.updateScore)), 
@@ -78,6 +96,15 @@ router.put('/',
  *     responses:
  *       200:
  *         description: Xác thực thành công.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/SuccessResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       $ref: '#/components/schemas/Score'
  */
 router.patch('/verify', 
     asyncHandler(validate(scoreRequest.verifyScore)), 
