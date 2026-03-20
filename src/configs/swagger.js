@@ -111,6 +111,59 @@ const swaggerOptions = {
                         data: { type: 'object' },
                         message: { type: 'string' }
                     }
+                },
+                Score: {
+                    type: 'object',
+                    properties: {
+                        _id: { type: 'string' },
+                        user_id: { type: 'string' },
+                        math: { type: 'number', default: 0 },
+                        literature: { type: 'number', default: 0 },
+                        english: { type: 'number', default: 0 },
+                        physics: { type: 'number', default: 0 },
+                        chemistry: { type: 'number', default: 0 },
+                        biology: { type: 'number', default: 0 },
+                        history: { type: 'number', default: 0 },
+                        geography: { type: 'number', default: 0 },
+                        civic_education: { type: 'number', default: 0 },
+                        combinations: { type: 'object' },
+                        average: { type: 'number', default: 0 },
+                        verified: { type: 'boolean', default: false },
+                    }
+                },
+                AcademicScoreSemester: {
+                    type: 'object',
+                    properties: {
+                        name: { type: 'string' },
+                        scores: {
+                            type: 'object',
+                            properties: {
+                                math: { type: 'number', default: 0 },
+                                literature: { type: 'number', default: 0 },
+                                english: { type: 'number', default: 0 },
+                                physics: { type: 'number', default: 0 },
+                                chemistry: { type: 'number', default: 0 },
+                                biology: { type: 'number', default: 0 },
+                                history: { type: 'number', default: 0 },
+                                geography: { type: 'number', default: 0 },
+                                civic_education: { type: 'number', default: 0 },
+                            }
+                        },
+                        average: { type: 'number', default: 0 },
+                        conduct: { type: 'string', default: 'Tốt' },
+                        academic_rank: { type: 'string', default: 'Giỏi' }
+                    }
+                },
+                AcademicScore: {
+                    type: 'object',
+                    properties: {
+                        _id: { type: 'string' },
+                        user_id: { type: 'string' },
+                        semesters: {
+                            type: 'array',
+                            items: { $ref: '#/components/schemas/AcademicScoreSemester' }
+                        }
+                    }
                 }
             }
         },

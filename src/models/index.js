@@ -8,6 +8,7 @@ export {default as User} from './user'
 export {default as Profile} from './profile'
 export {default as UserRole} from './user-role'
 export {default as Score} from './score'
+export {default as AcademicScore} from './academic-score'
 export {default as UserPermissionGroup} from './user-permission-group'
 export {default as UserPermission} from './user-permission'
 

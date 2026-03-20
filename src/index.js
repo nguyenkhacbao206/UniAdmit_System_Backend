@@ -3,6 +3,7 @@ import path from 'path'
 import serveFavicon from 'serve-favicon'
 import helmet from 'helmet'
 import multer from 'multer'
+import cookieParser from 'cookie-parser'
 import swaggerUi from 'swagger-ui-express'
 import {APP_DEBUG, NODE_ENV, PUBLIC_DIR, VIEW_DIR} from './configs'
 import swaggerSpec from './configs/swagger.js'
@@ -42,6 +43,7 @@ function createApp() {
     }))
     app.use(express.json())
     app.use(express.urlencoded({extended: true}))
+    app.use(cookieParser())
     app.use(multer({storage: multer.memoryStorage()}).any())
     app.use(formDataHandler)
     app.use(initLocalsHandler)
