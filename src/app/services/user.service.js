@@ -81,8 +81,12 @@ export async function updateAvatar(userId, avatarPath) {
     user.avatar = avatarPath
     await user.save()
     
-    // Đồng bộ sang Profile
-    await Profile.findOneAndUpdate({ user_id: userId }, { avatar: avatarPath })
+    // Đồng bộ sang Profile (upsert để đảm bảo tạo mới nếu chưa có)
+    await Profile.findOneAndUpdate(
+        { user_id: userId }, 
+        { avatar: avatarPath },
+        { upsert: true, new: true }
+    )
     
     return user.avatar
 }
