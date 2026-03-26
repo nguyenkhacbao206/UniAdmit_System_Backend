@@ -25,6 +25,27 @@ universityRouter.use(asyncHandler(authMiddleware.checkValidToken))
  *     summary: Get list of universities
  *     security:
  *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *         description: Search keyword
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: per_page
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *         description: Items per page
+ *     responses:
+ *       200:
+ *         description: Success
  */
 universityRouter.get(
     '/',
@@ -40,6 +61,19 @@ universityRouter.get(
  *     summary: Get university details
  *     security:
  *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: universityId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/University'
  */
 universityRouter.get(
     '/:universityId',
@@ -55,6 +89,34 @@ universityRouter.get(
  *     summary: Create a university
  *     security:
  *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - code
+ *               - name
+ *             properties:
+ *               code:
+ *                 type: string
+ *                 example: 'BKA'
+ *               name:
+ *                 type: string
+ *                 example: 'Đại học Bách Khoa Hà Nội'
+ *               location:
+ *                 type: string
+ *                 example: 'Hà Nội'
+ *               majors:
+ *                 type: integer
+ *                 example: 50
+ *               status:
+ *                 type: string
+ *                 enum: ['active', 'inactive']
+ *     responses:
+ *       201:
+ *         description: Created
  */
 universityRouter.post(
     '/',
@@ -70,6 +132,38 @@ universityRouter.post(
  *     summary: Update a university
  *     security:
  *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: universityId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - code
+ *               - name
+ *             properties:
+ *               code:
+ *                 type: string
+ *                 example: 'BKA'
+ *               name:
+ *                 type: string
+ *                 example: 'Đại học Bách Khoa Hà Nội'
+ *               location:
+ *                 type: string
+ *               majors:
+ *                 type: integer
+ *               status:
+ *                 type: string
+ *                 enum: ['active', 'inactive']
+ *     responses:
+ *       200:
+ *         description: Updated
  */
 universityRouter.put(
     '/:universityId',
@@ -86,6 +180,15 @@ universityRouter.put(
  *     summary: Delete a university
  *     security:
  *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: universityId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Deleted
  */
 universityRouter.delete(
     '/:universityId',

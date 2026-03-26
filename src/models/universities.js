@@ -25,7 +25,7 @@ const University = createModel(
 
         status: {
             type: String,
-            default: "active"  // active | inactive
+            default: 'active'  // active | inactive
         }
     },
     {
