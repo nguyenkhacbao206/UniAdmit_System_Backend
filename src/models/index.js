@@ -11,4 +11,4 @@ export {default as Score} from './score'
 export {default as AcademicScore} from './academic-score'
 export {default as UserPermissionGroup} from './user-permission-group'
 export {default as UserPermission} from './user-permission'
-
+export {default as University} from './universities'
