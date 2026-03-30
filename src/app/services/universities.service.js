@@ -20,6 +20,9 @@ export const createUniversity = async (data) => {
 
 export const getUniversity = async () => {
     const university = await University.find()
+    if (!university) {
+        abort(404, 'Không tìm thấy trường đại học.')
+    }
     return university
 }
 
