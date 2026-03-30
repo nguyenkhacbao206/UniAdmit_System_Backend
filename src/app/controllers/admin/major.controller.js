@@ -15,7 +15,7 @@ export const createMajorController = async (req, res) => {
         return res.status(error.status || 500).json({
             success: false,
             message: error.message || 'Lỗi server',
-            error: error.stack
+
         })
     }
 }
@@ -32,7 +32,7 @@ export const getMajorController = async (req, res) => {
         return res.status(error.status || 500).json({
             success: false,
             message: error.message || 'Lỗi server',
-            error: error.stack
+
         })
     }
 }
@@ -74,7 +74,7 @@ export const updateMajorController = async (req, res) => {
         return res.status(error.status || 500).json({
             success: false,
             message: error.message || 'Lỗi server',
-            error: error.stack
+
         })
     }
 }
@@ -117,8 +117,7 @@ export const getMajorBySearchController = async (req, res) => {
         return res.status(error.status || 500).json({
             success: false,
             message: error.message || 'Lỗi server',
-            error: error.stack
+
         })
     }
 }
-
