@@ -1,10 +1,10 @@
 import * as universitiesService from '@/app/services/universities.service'
-import { message } from 'statuses';
+import { message } from 'statuses'
 
 export const createUniversitiesController = async (req, res) => {
     try {
-        const { data } = req.body;
-        const createUniversity = universitiesService.createUniversity(data);
+        const { data } = req.body
+        const createUniversity = await universitiesService.createUniversity(data)
 
         return res.status(200).json({
             success: true,
@@ -21,7 +21,7 @@ export const createUniversitiesController = async (req, res) => {
 
 export const getUniversitiesController = async (req, res) => {
     try {
-        const getUniversity = await universitiesService.getUniversity();
+        const getUniversity = await universitiesService.getUniversity()
         return res.status(200).json({
             success: true,
             message: 'Lấy danh sách trường thành công',
@@ -37,12 +37,12 @@ export const getUniversitiesController = async (req, res) => {
 
 export const getUniversityByIdController = async (req, res) => {
     try {
-        const id = req.params.id;
+        const id = req.params.id
         const getUniversityById = await universitiesService.getUniversityById(id)
 
         return res.status.json({
             success: true,
-            message: "Lấy thông tin trường thành công",
+            message: 'Lấy thông tin trường thành công',
             data: getUniversityById
         })
     } catch (err) {
@@ -55,13 +55,13 @@ export const getUniversityByIdController = async (req, res) => {
 
 export const updateUniversitiesController = async (req, res) => {
     try {
-        const id = req.params.id;
+        const id = req.params.id
         const data = req.body
-        const updateUniversity = await universitiesService.updateUniversity(id, data);
+        const updateUniversity = await universitiesService.updateUniversity(id, data)
 
         return res.status.json({
             success: true,
-            message: "cập nhật trường thành công",
+            message: 'cập nhật trường thành công',
             data: updateUniversity
         })
     } catch (err) {
@@ -74,12 +74,12 @@ export const updateUniversitiesController = async (req, res) => {
 
 export const deleteUniversitiesController = async (req, res) => {
     try {
-        const id = req.params.id;
-        const deleteUniversity = await universitiesService.deleteUniversity(id);
+        const id = req.params.id
+        const deleteUniversity = await universitiesService.deleteUniversity(id)
 
         return res.status.json({
             success: true,
-            message: "Xóa trường thành công",
+            message: 'Xóa trường thành công',
             data: deleteUniversity
         })
     } catch (err) {
@@ -93,12 +93,12 @@ export const deleteUniversitiesController = async (req, res) => {
 
 export const getUniversityBySearch = async (req, res) => {
     try {
-        const data = req.query;
-        const getUniversityBySearch = await universitiesService.getUniversityBySearch(data);
+        const data = req.query
+        const getUniversityBySearch = await universitiesService.getUniversityBySearch(data)
 
         return res.status.json({
             success: true,
-            message: "search thành công",
+            message: 'search thành công',
             data: getUniversityBySearch
         })
     } catch (err) {
@@ -112,7 +112,7 @@ export const getUniversityBySearch = async (req, res) => {
 
 export const getUniversityByPage = async (req, res) => {
     try {
-        const { page, limit } = req.query;
+        const { page, limit } = req.query
 
         const getPage = await universitiesService.getUniversityByPages(
             page,
@@ -121,15 +121,15 @@ export const getUniversityByPage = async (req, res) => {
 
         const result = res.status(200).json({
             success: true,
-            message: "",
+            message: '',
             data: getPage
         })
 
-        return result;
+        return result
     } catch (err) {
         res.status(500).json({
             success: false,
-            message: err.message || "Lỗi server"
+            message: err.message || 'Lỗi server'
         })
     }
 }

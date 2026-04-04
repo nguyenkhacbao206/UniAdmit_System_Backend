@@ -6,16 +6,16 @@ import { Enrollment } from '@/models'
 
 export const createRequest = Joi.object({
     code: Joi.string()
-        .required
+        .required()
         .trim()
         .max(50)
         .label('Mã ngành')
         .custom(
-            async (value, helper) => {
-                new AsyncValidate(value, function () { })
-                const enrollment = await Enrollment.findOne({ code: value })
-                return !enrollment ? value : helper.console.error('Code đã tồn tại')
-            }
+            (value, helpers) =>
+                new AsyncValidate(value, async function () {
+                    const enrollment = await Enrollment.findOne({ code: value })
+                    return !enrollment ? value : helpers.error('any.exists')
+                })
         ),
 
     name: Joi.string()
@@ -24,7 +24,6 @@ export const createRequest = Joi.object({
         .label('Tên đợt tuyển sinh'),
 
     year: Joi.number()
-        .trim()
         .required()
         .label('Năm tuyển sinh'),
 
@@ -63,7 +62,6 @@ export const updateRequest = Joi.object({
         .label('Tên đợt tuyển sinh'),
 
     year: Joi.number()
-        .trim()
         .required()
         .label('Năm tuyển sinh'),
 
