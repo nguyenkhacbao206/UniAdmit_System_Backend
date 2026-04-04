@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 import {Router} from 'express'
 import {asyncHandler} from '@/utils/helpers'
 import validate from '@/app/middleware/user/validate'
@@ -6,7 +7,6 @@ import * as authRequest from '@/app/requests/user/auth.request'
 import * as authController from '@/app/controllers/user/auth.controller'
 
 const authRouter = Router()
-
 /**
  * @swagger
  * /user/auth/register:

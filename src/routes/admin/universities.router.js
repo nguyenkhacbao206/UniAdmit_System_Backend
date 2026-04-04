@@ -50,7 +50,7 @@ universityRouter.use(asyncHandler(authMiddleware.checkValidToken))
 universityRouter.get(
     '/',
     asyncHandler(validate(universitiesRequest.getList)),
-    asyncHandler(universitiesController.getList)
+    asyncHandler(universitiesController.getUniversitiesController)
 )
 
 /**
@@ -78,7 +78,7 @@ universityRouter.get(
 universityRouter.get(
     '/:universityId',
     asyncHandler(universitiesMiddleware.checkUniversityId),
-    asyncHandler(universitiesController.getDetail)
+    asyncHandler(universitiesController.getUniversityByIdController)
 )
 
 /**
@@ -121,7 +121,7 @@ universityRouter.get(
 universityRouter.post(
     '/',
     asyncHandler(validate(universitiesRequest.createItem)),
-    asyncHandler(universitiesController.createItem)
+    asyncHandler(universitiesController.createUniversitiesController)
 )
 
 /**
@@ -169,7 +169,7 @@ universityRouter.put(
     '/:universityId',
     asyncHandler(universitiesMiddleware.checkUniversityId),
     asyncHandler(validate(universitiesRequest.updateItem)),
-    asyncHandler(universitiesController.updateItem)
+    asyncHandler(universitiesController.updateUniversitiesController)
 )
 
 /**
@@ -193,7 +193,7 @@ universityRouter.put(
 universityRouter.delete(
     '/:universityId',
     asyncHandler(universitiesMiddleware.checkUniversityId),
-    asyncHandler(universitiesController.deleteItem)
+    asyncHandler(universitiesController.deleteUniversitiesController)
 )
 
 export default universityRouter
