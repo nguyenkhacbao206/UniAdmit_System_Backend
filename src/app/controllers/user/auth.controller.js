@@ -28,7 +28,22 @@ export async function login(req, res) {
 
 export async function verifyLoginOTP(req, res) {
     const user = await authService.verifyOTP(req.body, false) // false vì user đã ACTIVE rồi
-    res.jsonify(authService.authTokenUser(user), 'Đăng nhập thành công.')
+    const tokenData = authService.authTokenUser(user)
+
+    // Lưu refresh token vào cookie (httpOnly)
+    res.cookie('refreshToken', tokenData.refresh_token, {
+        httpOnly: true,
+        secure: false, // dev thì false, production -> true
+        sameSite: 'Lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+
+    // Trả access token cho frontend
+    res.jsonify({
+        access_token: tokenData.access_token,
+        expire_in: tokenData.expire_in,
+        auth_type: tokenData.auth_type,
+    }, 'Đăng nhập thành công.')
 }
 
 export async function register(req, res) {
@@ -104,7 +119,14 @@ export async function resetPassword(req, res) {
 
 export async function logout(req, res) {
     const token = getToken(req.headers)
-    await authService.blockToken(token)
+
+    if (token) {
+        await authService.blockToken(token)
+    }
+
+    // Xoá cookie refresh token
+    res.clearCookie('refreshToken')
+
     res.jsonify('Đăng xuất thành công.')
 }
 
@@ -147,20 +169,43 @@ export async function googleCallback(req, res) {
     const user = await authService.findOrCreateUserByGoogle(data)
     const tokenData = authService.authTokenUser(user)
 
-    // Redirect về client kèm tokens.
+    // Lưu refresh token vào cookie
+    res.cookie('refreshToken', tokenData.refresh_token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'Lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+
+    // Redirect về client chỉ kèm access_token
     const urlClient = new URL(`${APP_URL_CLIENT}/login-success`)
     urlClient.searchParams.append('access_token', tokenData.access_token)
-    urlClient.searchParams.append('refresh_token', tokenData.refresh_token)
     urlClient.searchParams.append('expire_in', tokenData.expire_in)
 
     res.redirect(urlClient.toString())
 }
 
 export async function refreshToken(req, res) {
-    const { refresh_token } = req.body
+    // Đọc refresh token từ cookie (httpOnly)
+    const refresh_token = req.cookies?.refreshToken
+
     if (!refresh_token) {
-        abort(400, 'Refresh token không được bỏ trống.')
+        abort(400, 'Không tìm thấy refresh token.')
     }
+
     const tokenData = await authService.refreshUserToken(refresh_token)
-    res.jsonify(tokenData)
+
+    // Set lại cookie mới
+    res.cookie('refreshToken', tokenData.refresh_token, {
+        httpOnly: true,
+        secure: false, // dev
+        sameSite: 'Lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+
+    res.jsonify({
+        access_token: tokenData.access_token,
+        expire_in: tokenData.expire_in,
+        auth_type: tokenData.auth_type,
+    })
 }
