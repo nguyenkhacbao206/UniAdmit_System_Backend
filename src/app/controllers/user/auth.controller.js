@@ -178,7 +178,11 @@ export async function googleCallback(req, res) {
     })
 
     // Redirect về client chỉ kèm access_token
+<<<<<<< HEAD
     const urlClient = new URL(`${APP_URL_CLIENT}/google-oauth-callback`)
+=======
+    const urlClient = new URL(`${APP_URL_CLIENT}/login-success`)
+>>>>>>> 27b44fe63035201c533dffe9b83c7009f8ffecda
     urlClient.searchParams.append('access_token', tokenData.access_token)
     urlClient.searchParams.append('expire_in', tokenData.expire_in)
 

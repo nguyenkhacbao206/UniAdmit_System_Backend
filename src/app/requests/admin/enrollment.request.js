@@ -6,16 +6,28 @@ import { Enrollment } from '@/models'
 
 export const createRequest = Joi.object({
     code: Joi.string()
+<<<<<<< HEAD
         .required()
+=======
+        .required
+>>>>>>> 27b44fe63035201c533dffe9b83c7009f8ffecda
         .trim()
         .max(50)
         .label('Mã ngành')
         .custom(
+<<<<<<< HEAD
             (value, helpers) =>
                 new AsyncValidate(value, async function () {
                     const enrollment = await Enrollment.findOne({ code: value })
                     return !enrollment ? value : helpers.error('any.exists')
                 })
+=======
+            async (value, helper) => {
+                new AsyncValidate(value, function () { })
+                const enrollment = await Enrollment.findOne({ code: value })
+                return !enrollment ? value : helper.console.error('Code đã tồn tại')
+            }
+>>>>>>> 27b44fe63035201c533dffe9b83c7009f8ffecda
         ),
 
     name: Joi.string()
@@ -24,6 +36,10 @@ export const createRequest = Joi.object({
         .label('Tên đợt tuyển sinh'),
 
     year: Joi.number()
+<<<<<<< HEAD
+=======
+        .trim()
+>>>>>>> 27b44fe63035201c533dffe9b83c7009f8ffecda
         .required()
         .label('Năm tuyển sinh'),
 
@@ -62,6 +78,10 @@ export const updateRequest = Joi.object({
         .label('Tên đợt tuyển sinh'),
 
     year: Joi.number()
+<<<<<<< HEAD
+=======
+        .trim()
+>>>>>>> 27b44fe63035201c533dffe9b83c7009f8ffecda
         .required()
         .label('Năm tuyển sinh'),
 
