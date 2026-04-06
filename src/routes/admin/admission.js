@@ -4,6 +4,7 @@ import * as admissionMethodRequest from '@/app/requests/admin/admission-method.r
 import * as admissionMethodController from '@/app/controllers/admin/admission-method.controller'
 import * as authMiddleware from '@/app/middleware/admin/auth.middleware'
 import { asyncHandler } from '@/utils/helpers'
+import { requireRole } from '@/app/middleware/permission'
 import validate from '@/app/middleware/admin/validate'
 
 const admissionMethodRouter = Router()
@@ -116,6 +117,7 @@ admissionMethodRouter.get(
  */
 admissionMethodRouter.post(
     '/',
+    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(validate(admissionMethodRequest.createItem)),
     asyncHandler(admissionMethodController.createItem)
 )
@@ -156,6 +158,7 @@ admissionMethodRouter.post(
  */
 admissionMethodRouter.put(
     '/:admissionMethodId',
+    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(admissionMethodMiddleware.checkAdmissionMethodId),
     asyncHandler(validate(admissionMethodRequest.updateItem)),
     asyncHandler(admissionMethodController.updateItem)
@@ -181,6 +184,7 @@ admissionMethodRouter.put(
  */
 admissionMethodRouter.delete(
     '/:admissionMethodId',
+    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(admissionMethodMiddleware.checkAdmissionMethodId),
     asyncHandler(admissionMethodController.deleteItem)
 )

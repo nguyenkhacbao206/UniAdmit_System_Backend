@@ -3,6 +3,7 @@ import * as roleRequest from '@/app/requests/admin/role.request'
 import * as roleController from '@/app/controllers/admin/role.controller'
 import * as authMiddleware from '@/app/middleware/admin/auth.middleware'
 import {asyncHandler} from '@/utils/helpers'
+import {requireRole} from '@/app/middleware/permission'
 import {Router} from 'express'
 import validate from '@/app/middleware/admin/validate'
 
@@ -81,6 +82,7 @@ roleRouter.get(
  */
 roleRouter.post(
     '/',
+    asyncHandler(requireRole(['super-admin'], 'admin')),
     asyncHandler(validate(roleRequest.createItem)),
     asyncHandler(roleController.createItem)
 )
@@ -118,6 +120,7 @@ roleRouter.post(
  */
 roleRouter.put(
     '/:roleId',
+    asyncHandler(requireRole(['super-admin'], 'admin')),
     asyncHandler(roleMiddleware.checkRoleId),
     roleMiddleware.canUpdate,
     asyncHandler(validate(roleRequest.updateItem)),
@@ -144,6 +147,7 @@ roleRouter.put(
  */
 roleRouter.delete(
     '/:roleId',
+    asyncHandler(requireRole(['super-admin'], 'admin')),
     asyncHandler(roleMiddleware.checkRoleId),
     roleMiddleware.canDelete,
     asyncHandler(roleController.deleteItem)
@@ -198,6 +202,7 @@ roleRouter.get(
  */
 roleRouter.patch(
     '/:roleId/update-permission-for-role/:permissionId',
+    asyncHandler(requireRole(['super-admin'], 'admin')),
     asyncHandler(roleMiddleware.checkRoleId),
     roleMiddleware.canUpdate,
     asyncHandler(roleMiddleware.checkPermissionId),
@@ -287,6 +292,7 @@ roleRouter.get(
  */
 roleRouter.patch(
     '/:roleId/add-accounts',
+    asyncHandler(requireRole(['super-admin'], 'admin')),
     asyncHandler(roleMiddleware.checkRoleId),
     roleMiddleware.canUpdate,
     asyncHandler(validate(roleRequest.addAccountsForRole)),
@@ -318,6 +324,7 @@ roleRouter.patch(
  */
 roleRouter.delete(
     '/:roleId/delete-account-in-role/:accountId',
+    asyncHandler(requireRole(['super-admin'], 'admin')),
     asyncHandler(roleMiddleware.checkRoleId),
     roleMiddleware.canUpdate,
     asyncHandler(roleMiddleware.checkAccountId),

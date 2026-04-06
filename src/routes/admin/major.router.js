@@ -3,6 +3,7 @@ import * as majorRequest from '@/app/requests/admin/major.request'
 import * as majorController from '@/app/controllers/admin/major.controller'
 import * as authMiddleware from '@/app/middleware/admin/auth.middleware'
 import { asyncHandler } from '@/utils/helpers'
+import { requireRole } from '@/app/middleware/permission'
 import { Router } from 'express'
 import validate from '@/app/middleware/admin/validate'
 
@@ -132,6 +133,7 @@ majorRouter.get(
  */
 majorRouter.post(
     '/',
+    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(validate(majorRequest.createItem)),
     asyncHandler(majorController.createMajorController)
 )
@@ -187,6 +189,7 @@ majorRouter.post(
  */
 majorRouter.put(
     '/:majorId',
+    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(majorMiddleware.checkMajorId),
     asyncHandler(validate(majorRequest.updateItem)),
     asyncHandler(majorController.updateMajorController)
@@ -212,6 +215,7 @@ majorRouter.put(
  */
 majorRouter.delete(
     '/:majorId',
+    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(majorMiddleware.checkMajorId),
     asyncHandler(majorController.daleteMajorController)
 )

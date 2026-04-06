@@ -52,7 +52,11 @@ const Admin = createModel(
             type: [ObjectId],
             required: true,
             default: [],
-
+        },
+        is_protected: {
+            type: Boolean,
+            required: true,
+            default: false,
         },
         deleted: {
             type: Boolean,
