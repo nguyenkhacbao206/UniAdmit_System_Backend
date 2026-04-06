@@ -1,6 +1,6 @@
-import {AdmissionMethod} from '@/models'
-import {AsyncValidate} from '@/utils/classes'
-import {tryValidateOrDefault} from '@/utils/helpers'
+import { AdmissionMethod } from '@/models'
+import { AsyncValidate } from '@/utils/classes'
+// import {tryValidateOrDefault} from '@/utils/helpers'
 import Joi from 'joi'
 
 export const createItem = Joi.object({
@@ -12,7 +12,7 @@ export const createItem = Joi.object({
         .custom(
             (value, helpers) =>
                 new AsyncValidate(value, async function () {
-                    const admissionMethod = await AdmissionMethod.findOne({code: value})
+                    const admissionMethod = await AdmissionMethod.findOne({ code: value })
                     return !admissionMethod ? value : helpers.error('any.exists')
                 })
         ),

@@ -1,10 +1,7 @@
 import * as enrollmentService from '@/app/services/enrollment.service'
-<<<<<<< HEAD
-import { message } from 'statuses'
+// import { message } from 'statuses'
 
 
-=======
->>>>>>> 27b44fe63035201c533dffe9b83c7009f8ffecda
 
 
 export const createEnollmentController = async (req, res) => {
