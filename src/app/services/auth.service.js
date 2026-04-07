@@ -22,8 +22,8 @@ export async function checkValidLoginAdmin({ phone, password }) {
     return false
 }
 
-export function authToken(admin) {
-    const accessToken = generateToken({ adminId: admin._id }, TOKEN_TYPE.ADMIN_AUTHORIZATION, ACCESS_TOKEN_EXPIRE_IN)
+export function authToken(admin, roleCodes = []) {
+    const accessToken = generateToken({ adminId: admin._id, roles: roleCodes }, TOKEN_TYPE.ADMIN_AUTHORIZATION, ACCESS_TOKEN_EXPIRE_IN)
     const refreshToken = generateToken({ adminId: admin._id }, TOKEN_TYPE.ADMIN_REFRESH_TOKEN, REFRESH_TOKEN_EXPIRE_IN)
 
     const decode = jwt.decode(accessToken)
@@ -88,7 +88,7 @@ export async function universalLogin({ identifier, username, password }) {
         const roleCodes = admin.roles ? admin.roles.map(r => r.code) : []
         if (roleCodes.length === 0) abort(403, 'Tài khoản chưa được phân quyền truy cập.')
 
-        const tokenData = authToken(admin)
+        const tokenData = authToken(admin, roleCodes)
         return { user: admin, tokenData, roles: roleCodes, account_type: 'admin' }
     }
 
@@ -143,13 +143,14 @@ export async function refreshUserToken(refreshToken) {
 export async function refreshAdminToken(refreshToken) {
     try {
         const decoded = verifyToken(refreshToken, TOKEN_TYPE.ADMIN_REFRESH_TOKEN)
-        const admin = await Admin.findOne({ _id: decoded.adminId, deleted: false })
+        const admin = await Admin.findOne({ _id: decoded.adminId, deleted: false }).populate('roles')
 
         if (!admin || admin.status === STATUS_ACCOUNT.DE_ACTIVE) {
             abort(401, 'Token không hợp lệ hoặc tài khoản đã bị khóa.')
         }
 
-        return authToken(admin)
+        const roleCodes = admin.roles ? admin.roles.map(r => r.code) : []
+        return authToken(admin, roleCodes)
     } catch (e) {
         abort(401, 'Refresh token không hợp lệ hoặc đã hết hạn.')
     }
