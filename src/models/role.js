@@ -16,6 +16,16 @@ const Role = createModel(
             type: String,
             default: '',
         },
+        parent_id: {
+            type: ObjectId,
+            default: null,
+            ref: 'Role'
+        },
+        can_edit: {
+            type: Boolean,
+            required: true,
+            default: true,
+        },
         can_delete: {
             type: Boolean,
             required: true,

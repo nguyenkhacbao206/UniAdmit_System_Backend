@@ -22,8 +22,8 @@ export async function checkValidLoginAdmin({ phone, password }) {
     return false
 }
 
-export function authToken(admin) {
-    const accessToken = generateToken({ adminId: admin._id }, TOKEN_TYPE.ADMIN_AUTHORIZATION, ACCESS_TOKEN_EXPIRE_IN)
+export function authToken(admin, roleCodes = []) {
+    const accessToken = generateToken({ adminId: admin._id, roles: roleCodes }, TOKEN_TYPE.ADMIN_AUTHORIZATION, ACCESS_TOKEN_EXPIRE_IN)
     const refreshToken = generateToken({ adminId: admin._id }, TOKEN_TYPE.ADMIN_REFRESH_TOKEN, REFRESH_TOKEN_EXPIRE_IN)
 
     const decode = jwt.decode(accessToken)
@@ -71,6 +71,45 @@ export async function checkValidLoginUser({ email, password }) {
     return false
 }
 
+export async function universalLogin({ identifier, username, password }) {
+    const loginIdentifier = identifier || username
+    if (!loginIdentifier) abort(400, 'Vui lòng cung cấp email hoặc số điện thoại.')
+
+    // 1. Check Admin/Staff table first
+    const admin = await Admin.findOne({
+        $or: [{ email: loginIdentifier.toLowerCase() }, { phone: loginIdentifier }],
+        deleted: false
+    }).populate('roles')
+
+    if (admin) {
+        if (!admin.verifyPassword(password)) abort(400, 'Tài khoản hoặc mật khẩu không đúng.')
+        if (admin.status === STATUS_ACCOUNT.DE_ACTIVE) abort(400, 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản lý.')
+
+        const roleCodes = admin.roles ? admin.roles.map(r => r.code) : []
+        if (roleCodes.length === 0) abort(403, 'Tài khoản chưa được phân quyền truy cập.')
+
+        const tokenData = authToken(admin, roleCodes)
+        return { user: admin, tokenData, roles: roleCodes, account_type: 'admin' }
+    }
+
+    // 2. Check User table
+    const user = await User.findOne({
+        $or: [{ email: loginIdentifier.toLowerCase() }, { phone: loginIdentifier }],
+        deleted: false
+    })
+
+    if (user) {
+        if (!user.verifyPassword(password)) abort(400, 'Tài khoản hoặc mật khẩu không đúng.')
+        if (user.status === STATUS_ACCOUNT.UNVERIFIED) abort(400, 'Tài khoản chưa được xác thực. Vui lòng kiểm tra email.')
+        if (user.status === STATUS_ACCOUNT.DE_ACTIVE) abort(400, 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản lý.')
+
+        await updateOTP(user)
+        return { user, roles: ['user'], account_type: 'user', requires_otp: true }
+    }
+
+    abort(400, 'Tài khoản hoặc mật khẩu không đúng.')
+}
+
 export function authTokenUser(user) {
     const accessToken = generateToken({ userId: user._id }, TOKEN_TYPE.USER_AUTHORIZATION, ACCESS_TOKEN_EXPIRE_IN)
     const refreshToken = generateToken({ userId: user._id }, TOKEN_TYPE.USER_REFRESH_TOKEN, REFRESH_TOKEN_EXPIRE_IN)
@@ -104,13 +143,14 @@ export async function refreshUserToken(refreshToken) {
 export async function refreshAdminToken(refreshToken) {
     try {
         const decoded = verifyToken(refreshToken, TOKEN_TYPE.ADMIN_REFRESH_TOKEN)
-        const admin = await Admin.findOne({ _id: decoded.adminId, deleted: false })
+        const admin = await Admin.findOne({ _id: decoded.adminId, deleted: false }).populate('roles')
 
         if (!admin || admin.status === STATUS_ACCOUNT.DE_ACTIVE) {
             abort(401, 'Token không hợp lệ hoặc tài khoản đã bị khóa.')
         }
 
-        return authToken(admin)
+        const roleCodes = admin.roles ? admin.roles.map(r => r.code) : []
+        return authToken(admin, roleCodes)
     } catch (e) {
         abort(401, 'Refresh token không hợp lệ hoặc đã hết hạn.')
     }

@@ -1,5 +1,5 @@
 import * as universitiesService from '@/app/services/universities.service'
-import { message } from 'statuses'
+// import { message } from 'statuses'
 
 export const createUniversitiesController = async (req, res) => {
     try {

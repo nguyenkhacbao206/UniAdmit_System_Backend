@@ -3,6 +3,7 @@ import * as universitiesRequest from '@/app/requests/admin/universities.request'
 import * as universitiesController from '@/app/controllers/admin/universities.controller'
 import * as authMiddleware from '@/app/middleware/admin/auth.middleware'
 import { asyncHandler } from '@/utils/helpers'
+import { requireRole } from '@/app/middleware/permission'
 import { Router } from 'express'
 import validate from '@/app/middleware/admin/validate'
 
@@ -120,6 +121,7 @@ universityRouter.get(
  */
 universityRouter.post(
     '/',
+    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(validate(universitiesRequest.createItem)),
     asyncHandler(universitiesController.createUniversitiesController)
 )
@@ -167,6 +169,7 @@ universityRouter.post(
  */
 universityRouter.put(
     '/:universityId',
+    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(universitiesMiddleware.checkUniversityId),
     asyncHandler(validate(universitiesRequest.updateItem)),
     asyncHandler(universitiesController.updateUniversitiesController)
@@ -192,6 +195,7 @@ universityRouter.put(
  */
 universityRouter.delete(
     '/:universityId',
+    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(universitiesMiddleware.checkUniversityId),
     asyncHandler(universitiesController.deleteUniversitiesController)
 )

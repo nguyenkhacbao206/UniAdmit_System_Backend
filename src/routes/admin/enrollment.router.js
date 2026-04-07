@@ -3,6 +3,7 @@ import * as enrollmentRequest from '@/app/requests/admin/enrollment.request'
 import * as enrollmentController from '@/app/controllers/admin/enrollment.controller'
 import * as authMiddleware from '@/app/middleware/admin/auth.middleware'
 import { asyncHandler } from '@/utils/helpers'
+import { requireRole } from '@/app/middleware/permission'
 import { Router } from 'express'
 import validate from '@/app/middleware/admin/validate'
 
@@ -154,6 +155,7 @@ enrollmentRouter.get(
  */
 enrollmentRouter.post(
     '/',
+    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(validate(enrollmentRequest.createRequest)),
     asyncHandler(enrollmentController.createEnollmentController)
 )
@@ -206,6 +208,7 @@ enrollmentRouter.post(
  */
 enrollmentRouter.put(
     '/:enrollmentId',
+    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(enrollmentMiddleware.checkEnrollmentId),
     asyncHandler(validate(enrollmentRequest.updateRequest)),
     asyncHandler(enrollmentController.updateEnrollmentController)
@@ -231,6 +234,7 @@ enrollmentRouter.put(
  */
 enrollmentRouter.delete(
     '/:enrollmentId',
+    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(enrollmentMiddleware.checkEnrollmentId),
     asyncHandler(enrollmentController.deleteEnrollmentController)
 )
