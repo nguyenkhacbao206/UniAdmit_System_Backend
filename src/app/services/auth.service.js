@@ -13,7 +13,7 @@ export async function checkValidLoginAdmin({ phone, password }) {
     if (user) {
         const verified = user.verifyPassword(password)
         if (verified) {
-            if (user.status === STATUS_ACCOUNT.DE_ACTIVE) {
+            if (user.status === STATUS_ACCOUNT.INACTIVE) {
                 abort(400, 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản lý.')
             }
             return user
@@ -77,7 +77,7 @@ export async function checkValidLoginUser({ email, password }) {
             if (user.status === STATUS_ACCOUNT.UNVERIFIED) {
                 abort(400, 'Tài khoản chưa được xác thực. Vui lòng kiểm tra email.')
             }
-            if (user.status === STATUS_ACCOUNT.DE_ACTIVE) {
+            if (user.status === STATUS_ACCOUNT.INACTIVE) {
                 abort(400, 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản lý.')
             }
             return user
@@ -99,7 +99,7 @@ export async function universalLogin({ identifier, username, password }) {
 
     if (admin) {
         if (!admin.verifyPassword(password)) abort(400, 'Tài khoản hoặc mật khẩu không đúng.')
-        if (admin.status === STATUS_ACCOUNT.DE_ACTIVE) abort(400, 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản lý.')
+        if (admin.status === STATUS_ACCOUNT.INACTIVE) abort(400, 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản lý.')
 
         const roleCodes = admin.roles ? admin.roles.map(r => r.code) : []
         if (roleCodes.length === 0) abort(403, 'Tài khoản chưa được phân quyền truy cập.')
@@ -131,7 +131,7 @@ export async function universalLogin({ identifier, username, password }) {
     if (user) {
         if (!user.verifyPassword(password)) abort(400, 'Tài khoản hoặc mật khẩu không đúng.')
         if (user.status === STATUS_ACCOUNT.UNVERIFIED) abort(400, 'Tài khoản chưa được xác thực. Vui lòng kiểm tra email.')
-        if (user.status === STATUS_ACCOUNT.DE_ACTIVE) abort(400, 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản lý.')
+        if (user.status === STATUS_ACCOUNT.INACTIVE) abort(400, 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản lý.')
 
         await updateOTP(user)
         return { user, roles: ['user'], account_type: 'user', requires_otp: true }
@@ -160,7 +160,7 @@ export async function refreshUserToken(refreshToken) {
         const decoded = verifyToken(refreshToken, TOKEN_TYPE.USER_REFRESH_TOKEN)
         const user = await User.findOne({ _id: decoded.userId, deleted: false })
 
-        if (!user || user.status === STATUS_ACCOUNT.DE_ACTIVE) {
+        if (!user || user.status === STATUS_ACCOUNT.INACTIVE) {
             abort(401, 'Token không hợp lệ hoặc tài khoản đã bị khóa.')
         }
 
@@ -175,7 +175,7 @@ export async function refreshAdminToken(refreshToken) {
         const decoded = verifyToken(refreshToken, TOKEN_TYPE.ADMIN_REFRESH_TOKEN)
         const admin = await Admin.findOne({ _id: decoded.adminId, deleted: false }).populate('roles')
 
-        if (!admin || admin.status === STATUS_ACCOUNT.DE_ACTIVE) {
+        if (!admin || admin.status === STATUS_ACCOUNT.INACTIVE) {
             abort(401, 'Token không hợp lệ hoặc tài khoản đã bị khóa.')
         }
 
@@ -286,7 +286,7 @@ export async function resetPassword({ email, password }) {
         abort(404, 'Người dùng không tồn tại.')
     }
 
-    if (user.status === STATUS_ACCOUNT.DE_ACTIVE) {
+    if (user.status === STATUS_ACCOUNT.INACTIVE) {
         abort(400, 'Tài khoản đã bị khóa.')
     }
 
@@ -310,7 +310,7 @@ export async function findOrCreateUserByGoogle(profile) {
         })
     }
 
-    if (user.status === STATUS_ACCOUNT.DE_ACTIVE) {
+    if (user.status === STATUS_ACCOUNT.INACTIVE) {
         abort(400, 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản lý.')
     }
 
