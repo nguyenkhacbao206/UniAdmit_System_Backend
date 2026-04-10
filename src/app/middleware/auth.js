@@ -1,6 +1,6 @@
 import { abort, getToken, verifyToken } from '@/utils/helpers'
 import { TOKEN_TYPE } from '@/configs'
-import { Admin, User } from '@/models'
+import { Admin, User, Staff } from '@/models'
 import { tokenBlocklist } from '@/app/services/auth.service'
 import _ from 'lodash'
 
@@ -27,10 +27,23 @@ export async function checkUniversalToken(req, res, next) {
                 return next()
             }
         } catch (e) {
-            // Không phải admin, đi tiếp xuống user
+            // Không phải admin, đi tiếp
         }
 
-        // 2. Thử giải mã User
+        // 2. Thử giải mã Staff
+        try {
+            const { staffId } = verifyToken(token, TOKEN_TYPE.STAFF_AUTHORIZATION)
+            const staff = await Staff.findOne({ _id: staffId, deleted: false })
+            if (staff) {
+                req.currentStaff = staff
+                req.accountType = 'staff'
+                return next()
+            }
+        } catch (e) {
+            // Không phải staff, đi tiếp
+        }
+
+        // 3. Thử giải mã User
         try {
             const { userId } = verifyToken(token, TOKEN_TYPE.USER_AUTHORIZATION)
             const user = await User.findOne({ _id: userId, deleted: false })
@@ -40,7 +53,7 @@ export async function checkUniversalToken(req, res, next) {
                 return next()
             }
         } catch (e) {
-            // Cả hai đều failed
+            // Cả ba đều failed
         }
 
         abort(401, 'Token không hợp lệ hoặc đã hết hạn.')
