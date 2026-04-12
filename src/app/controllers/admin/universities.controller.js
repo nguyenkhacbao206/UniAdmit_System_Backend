@@ -3,7 +3,7 @@ import * as universitiesService from '@/app/services/universities.service'
 
 export const createUniversitiesController = async (req, res) => {
     try {
-        const { data } = req.body
+        const data = req.body
         const createUniversity = await universitiesService.createUniversity(data)
 
         return res.status(200).json({
