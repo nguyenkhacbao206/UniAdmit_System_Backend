@@ -1,25 +1,24 @@
-import { Admin } from '@/models'
-import { abort } from '@/utils/helpers'
+import { Staff } from '@/models'
+// import { abort } from '@/utils/helpers'
 
 export const getStaffs = async (req, res) => {
     try {
         const { page = 1, limit = 10, search = '' } = req.query
-        const query = { 
+        const query = {
             deleted: false,
             $or: [
                 { name: { $regex: search, $options: 'i' } },
-                { email: { $regex: search, $options: 'i' } },
+                { mail: { $regex: search, $options: 'i' } },
                 { phone: { $regex: search, $options: 'i' } }
             ]
         }
-        
-        const staffs = await Admin.find(query)
-            .populate('roles')
+
+        const staffs = await Staff.find(query)
             .limit(limit * 1)
             .skip((page - 1) * limit)
             .sort({ createdAt: -1 })
 
-        const count = await Admin.countDocuments(query)
+        const count = await Staff.countDocuments(query)
 
         return res.json({
             success: true,
@@ -38,12 +37,12 @@ export const getStaffs = async (req, res) => {
 
 export const createStaff = async (req, res) => {
     try {
-        const { name, email, phone, password, role_ids } = req.body
+        const { name, mail, phone, password, gender, dob, address } = req.body
 
         // Check duplicate
-        const existing = await Admin.findOne({ 
-            $or: [{ email: email.toLowerCase() }, { phone }],
-            deleted: false 
+        const existing = await Staff.findOne({
+            $or: [{ mail: mail.toLowerCase() }, { phone }],
+            deleted: false
         })
         if (existing) {
             return res.status(400).json({
@@ -52,12 +51,14 @@ export const createStaff = async (req, res) => {
             })
         }
 
-        const newStaff = await Admin.create({
+        const newStaff = await Staff.create({
             name,
-            email: email.toLowerCase(),
+            mail: mail.toLowerCase(),
             phone,
             password, // Password will be hashed by model setter
-            role_ids,
+            gender,
+            dob,
+            address,
             status: 'active'
         })
 
@@ -77,9 +78,9 @@ export const createStaff = async (req, res) => {
 export const updateStaff = async (req, res) => {
     try {
         const { id } = req.params
-        const { name, email, phone, password, role_ids, status } = req.body
+        const { name, mail, phone, password, gender, dob, address, status } = req.body
 
-        const staff = await Admin.findOne({ _id: id, deleted: false })
+        const staff = await Staff.findOne({ _id: id, deleted: false })
         if (!staff) {
             return res.status(404).json({
                 success: false,
@@ -87,12 +88,14 @@ export const updateStaff = async (req, res) => {
             })
         }
 
-        if (name) staff.name = name
-        if (email) staff.email = email.toLowerCase()
-        if (phone) staff.phone = phone
+        if (typeof name !== 'undefined') staff.name = name
+        if (typeof mail !== 'undefined') staff.mail = mail.toLowerCase()
+        if (typeof phone !== 'undefined') staff.phone = phone
         if (password) staff.password = password
-        if (role_ids) staff.role_ids = role_ids
-        if (status) staff.status = status
+        if (typeof gender !== 'undefined') staff.gender = gender
+        if (typeof dob !== 'undefined') staff.dob = dob
+        if (typeof address !== 'undefined') staff.address = address
+        if (typeof status !== 'undefined') staff.status = status
 
         await staff.save()
 
@@ -112,8 +115,8 @@ export const updateStaff = async (req, res) => {
 export const deleteStaff = async (req, res) => {
     try {
         const { id } = req.params
-        const staff = await Admin.findOne({ _id: id, deleted: false })
-        
+        const staff = await Staff.findOne({ _id: id, deleted: false })
+
         if (!staff) {
             return res.status(404).json({
                 success: false,

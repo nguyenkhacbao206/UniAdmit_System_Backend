@@ -44,6 +44,10 @@ export async function meUniversal(req, res) {
     if (req.accountType === 'admin') {
         const result = await authService.profileAdmin(req.currentAdmin)
         res.jsonify({ ...result, account_type: 'admin', roles: req.currentAdminRoles })
+    } else if (req.accountType === 'staff') {
+        const staffData = req.currentStaff.toObject()
+        delete staffData.password
+        res.jsonify({ ...staffData, account_type: 'staff', roles: ['staff'] })
     } else if (req.accountType === 'user') {
         // Just return the user obj without pw
         res.jsonify({ ...req.currentUser.toObject(), account_type: 'user', roles: ['user'] })
