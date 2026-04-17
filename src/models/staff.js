@@ -1,6 +1,5 @@
-import { required } from 'joi'
 import createModel from './base'
-import { Timestamp } from 'firebase-admin/firestore'
+import bcrypt from 'bcrypt'
 
 const Staff = createModel(
     'Staff',
@@ -8,6 +7,7 @@ const Staff = createModel(
     {
         code: {
             type: String,
+            default: ''
         },
 
         name: {
@@ -17,11 +17,12 @@ const Staff = createModel(
 
         mail: {
             type: String,
-            required: true
+            required: true,
+            lowercase: true
         },
 
         phone: {
-            type: Number,
+            type: String,
             required: true
         },
 
@@ -33,12 +34,26 @@ const Staff = createModel(
         status: {
             type: String,
             required: true,
-            enum: ['active', 'inactive']
+            enum: ['active', 'inactive'],
+            default: 'active'
+        },
+
+        deleted: {
+            type: Boolean,
+            required: true,
+            default: false
         }
     },
-
-    { Timestamp: true }
-
+    {
+        methods: {
+            verifyPassword(password) {
+                if (this.password && this.password.startsWith('$2')) {
+                    return bcrypt.compareSync(password, this.password)
+                }
+                return password === this.password
+            }
+        }
+    }
 )
 
-export default Staff
+export default Staff
