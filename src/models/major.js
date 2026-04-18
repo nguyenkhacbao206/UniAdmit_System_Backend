@@ -70,6 +70,7 @@ const Major = createModel(
                     ref: 'University',
                     localField: 'university_id',
                     foreignField: '_id',
+                    justOne: true,
                 },
             },
         },

@@ -51,7 +51,7 @@ export const getMajorService = async () => {
         description: item.description,
         duration: item.duration,
         status: item.status,
-        university: item.university.length
+        university: item.university
     }))
     return result
 }
@@ -77,6 +77,7 @@ export const updateMajorService = async (id, data) => {
     }
 
     const result = await Major.findByIdAndUpdate(id, data, { new: true })
+        .populate('university')
 
     return result
 }
@@ -136,7 +137,8 @@ export const getMajorByPages = async (data) => {
 
     const major = await Major.find()
         .skip(skip)
-        .limit(limit)
+        .limit(LimitNum)
+        .populate('university')
 
     const total = await Major.countDocuments()
 
