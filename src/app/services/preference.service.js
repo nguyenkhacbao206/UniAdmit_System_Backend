@@ -110,6 +110,7 @@ class PreferenceService {
         }
 
         const preferences = await Preference.find({ userId })
+            .populate('university major admissionMethod')
             .sort({ priority: 1 })
 
         const score = await Score.findOne({ userId })
@@ -122,8 +123,8 @@ class PreferenceService {
 
         for (const pref of preferences) {
             const rule = await Major.findOne({
-                majorId: pref.major,
-                admissionMethodId: pref.admissionMethod
+                majorId: pref.major?._id || pref.major,
+                admissionMethodId: pref.admissionMethod?._id || pref.admissionMethod
             })
 
             if (!rule) continue
