@@ -4,13 +4,13 @@ import { abort } from '@/utils/helpers'
 // import { options } from "joi";
 
 export const createUniversity = async (data) => {
-    const { code, name, location, major, status } = data
+    const { code, name, location, majors, status } = data
 
     const university = await University.create({
         code,
         name,
         location,
-        major,
+        majors,
         status
     })
 

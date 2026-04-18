@@ -121,3 +121,30 @@ export const getMajorBySearchController = async (req, res) => {
         })
     }
 }
+
+export const getMajorByPage = async (req, res) => {
+    try {
+        const { page, limit } = req.query
+
+        const getPage = await MajorService.getMajorByPages({
+            page,
+            limit
+        })
+
+        const result = res.status(200).json({
+            success: true,
+            message: '',
+            data: {
+                result: getPage.major,
+                total: getPage.total
+            }
+        })
+
+        return result
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message || 'Lỗi server'
+        })
+    }
+}

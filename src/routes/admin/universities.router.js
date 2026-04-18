@@ -54,6 +54,11 @@ universityRouter.get(
     asyncHandler(universitiesController.getUniversitiesController)
 )
 
+universityRouter.get(
+    '/page',
+    asyncHandler(universitiesController.getUniversityByPage)
+)
+
 /**
  * @swagger
  * /admin/universities/{universityId}:
@@ -77,7 +82,7 @@ universityRouter.get(
  *               $ref: '#/components/schemas/University'
  */
 universityRouter.get(
-    '/:universityId',
+    '/:id',
     asyncHandler(universitiesMiddleware.checkUniversityId),
     asyncHandler(universitiesController.getUniversityByIdController)
 )
@@ -168,7 +173,7 @@ universityRouter.post(
  *         description: Updated
  */
 universityRouter.put(
-    '/:universityId',
+    '/:id',
     asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(universitiesMiddleware.checkUniversityId),
     asyncHandler(validate(universitiesRequest.updateItem)),
@@ -194,7 +199,7 @@ universityRouter.put(
  *         description: Deleted
  */
 universityRouter.delete(
-    '/:universityId',
+    '/:id',
     asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(universitiesMiddleware.checkUniversityId),
     asyncHandler(universitiesController.deleteUniversitiesController)

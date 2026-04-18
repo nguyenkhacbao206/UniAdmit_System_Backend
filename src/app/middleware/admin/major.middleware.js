@@ -3,7 +3,7 @@ import { abort } from '@/utils/helpers'
 import { isValidObjectId } from 'mongoose'
 
 export async function checkMajorId(req, res, next) {
-    const defaultId = req.params.id || req.params.majorId
+    const defaultId = req.params.id
     if (isValidObjectId(defaultId)) {
         const major = await Major.findById(defaultId)
         if (major) {

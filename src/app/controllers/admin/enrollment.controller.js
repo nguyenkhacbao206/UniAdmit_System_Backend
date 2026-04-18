@@ -133,13 +133,14 @@ export const getEnrollmentByPage = async (req, res) => {
             limit
         )
 
-        const result = res.status(200).json({
+        return res.status(200).json({
             success: true,
             message: '',
-            data: enrollmentPage
+            data: {
+                result: enrollmentPage.enrollment,
+                total: enrollmentPage.total
+            }
         })
-
-        return result
     } catch (err) {
         return res.status(500).json({
             success: false,
