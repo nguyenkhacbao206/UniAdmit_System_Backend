@@ -17,6 +17,7 @@ export const createItem = Joi.object({
                 })
         ),
     name: Joi.string().trim().max(150).required().label('Tên ngành'),
+    major: Joi.string().trim().max(150).required().label('Chuyên ngành'),
     category: Joi.string().trim().max(100).required().label('Phương thức xét tuyển/Danh mục'),
     university_id: Joi.string()
         .trim()
@@ -46,6 +47,7 @@ export const updateItem = Joi.object({
                 })
         ),
     name: Joi.string().trim().max(150).required().label('Tên ngành'),
+    major: Joi.string().trim().max(150).required().label('Chuyên ngành'),
     category: Joi.string().trim().max(100).required().label('Phương thức xét tuyển/Danh mục'),
     university_id: Joi.string()
         .trim()

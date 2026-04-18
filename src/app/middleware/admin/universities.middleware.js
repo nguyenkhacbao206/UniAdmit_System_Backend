@@ -3,8 +3,8 @@ import { abort } from '@/utils/helpers'
 import { isValidObjectId } from 'mongoose'
 
 export async function checkUniversityId(req, res, next) {
-    if (isValidObjectId(req.params.universityId)) {
-        const university = await University.findById(req.params.universityId)
+    if (isValidObjectId(req.params.id)) {
+        const university = await University.findById(req.params.id)
         if (university) {
             req.university = university
             next()

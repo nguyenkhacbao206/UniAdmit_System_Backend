@@ -35,6 +35,11 @@ majorRouter.get(
     asyncHandler(majorController.getMajorController)
 )
 
+majorRouter.get(
+    '/page',
+    asyncHandler(majorController.getMajorByPage)
+)
+
 /**
  * @swagger
  * /admin/majors/search:
@@ -77,7 +82,7 @@ majorRouter.get(
  *         description: Success
  */
 majorRouter.get(
-    '/:majorId',
+    '/:id',
     asyncHandler(majorMiddleware.checkMajorId),
     asyncHandler(majorController.getMajorByIdController)
 )
@@ -188,7 +193,7 @@ majorRouter.post(
  *         description: Updated
  */
 majorRouter.put(
-    '/:majorId',
+    '/:id',
     asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(majorMiddleware.checkMajorId),
     asyncHandler(validate(majorRequest.updateItem)),
@@ -214,7 +219,7 @@ majorRouter.put(
  *         description: Deleted
  */
 majorRouter.delete(
-    '/:majorId',
+    '/:id',
     asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(majorMiddleware.checkMajorId),
     asyncHandler(majorController.daleteMajorController)

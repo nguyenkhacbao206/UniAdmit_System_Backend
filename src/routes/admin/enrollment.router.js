@@ -103,7 +103,7 @@ enrollmentRouter.get(
  *         description: Success
  */
 enrollmentRouter.get(
-    '/:enrollmentId',
+    '/:id',
     asyncHandler(enrollmentMiddleware.checkEnrollmentId),
     asyncHandler(enrollmentController.getEnrollmentByIdController)
 )
@@ -207,7 +207,7 @@ enrollmentRouter.post(
  *         description: Updated
  */
 enrollmentRouter.put(
-    '/:enrollmentId',
+    '/:id',
     asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(enrollmentMiddleware.checkEnrollmentId),
     asyncHandler(validate(enrollmentRequest.updateRequest)),
@@ -233,7 +233,7 @@ enrollmentRouter.put(
  *         description: Deleted
  */
 enrollmentRouter.delete(
-    '/:enrollmentId',
+    '/:id',
     asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(enrollmentMiddleware.checkEnrollmentId),
     asyncHandler(enrollmentController.deleteEnrollmentController)

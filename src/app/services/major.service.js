@@ -3,7 +3,7 @@ import { abort } from '@/utils/helpers'
 
 
 export const createMajorService = async (data) => {
-    const { code, name, category, university_id, quota, description, duration, status } = data
+    const { code, name, major, category, university_id, quota, description, duration, status } = data
 
     const existingMajor = await Major.findOne({ code })
     if (existingMajor) {
@@ -15,9 +15,10 @@ export const createMajorService = async (data) => {
         abort(404, 'Không tìm thấy trường đại học.')
     }
 
-    const major = await Major.create({
+    const newMajor = await Major.create({
         code,
         name,
+        major,
         category,
         university_id,
         quota,
@@ -26,7 +27,7 @@ export const createMajorService = async (data) => {
         status
     })
 
-    const result = await Major.findOne(major._id)
+    const result = await Major.findOne(newMajor._id)
         .populate('university', 'name')
 
     return result

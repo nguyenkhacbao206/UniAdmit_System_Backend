@@ -3,7 +3,7 @@ import { abort } from '@/utils/helpers'
 import { isValidObjectId } from 'mongoose'
 
 export const checkEnrollmentId = async (req, res, next) => {
-    const defaultId = req.params.id || req.params.MajorId
+    const defaultId = req.params.id
 
     if (isValidObjectId(defaultId)) {
         const enrollment = await Enrollment.findById(defaultId)

@@ -49,9 +49,9 @@ const Major = createModel(
 
         status: {
             type: String,
-            enum: Object.values(STATUS_ACCOUNT),
+            enum: ['active', 'inactive'],
             required: true,
-            default: STATUS_ACCOUNT.ACTIVE,
+            default: 'active',
         }
 
     },
