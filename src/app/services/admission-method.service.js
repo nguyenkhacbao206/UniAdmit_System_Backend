@@ -20,47 +20,50 @@ export const createAdmissionMethodService = async (data) => {
     return admissionMethod
 }
 
-export const getAdmissionMethodServiice = async () => {
+export const getAdmissionMethodService = async () => {
     const admissionMethod = await AdmissionMethod.find()
+    if (!admissionMethod) {
+        abort(400, 'không tồn tại phương thức tuyển sinh')
+    }
     return admissionMethod
 }
 
 export const getAdmissionMethodByIdService = async (id) => {
     const admissionMethod = await AdmissionMethod.findById(id)
 
-    if(!admissionMethod){
+    if (!admissionMethod) {
         abort(400, 'không tồn tại phương thức tuyển sinh')
     }
 
     return admissionMethod
 }
 
-export const updateAdmissionMethod = async(id, data) => {
+export const updateAdmissionMethod = async (id, data) => {
     const updateAdmission = await AdmissionMethod.findByIdAndUpdate(
         id,
         data,
         { new: true }
     )
 
-    if(!updateAdmission){
+    if (!updateAdmission) {
         abort(400, 'không tìm thấy phương thức tuyển sinh')
     }
 
     return updateAdmission
 }
 
-export const deleteAdmissionMethod = async(id) => {
+export const deleteAdmissionMethod = async (id) => {
     const deleteData = await AdmissionMethod.findOneAndDelete(id)
 
-    if(!deleteData){
+    if (!deleteData) {
         abort(400, 'không tìm thấy phương thức tuyển sinh')
     }
-    
+
     return deleteData
 }
 
 export const getAdmissionMethodBySearch = async (data) => {
-    const { code, method, description, status} = data
+    const { code, method, description, status } = data
     const query = {}
 
     if (code) {
@@ -69,14 +72,14 @@ export const getAdmissionMethodBySearch = async (data) => {
             $options: 'i'
         }
     }
-    
+
     if (method) {
         query.methodName = {
             $regex: method,
             $options: 'i'
         }
     }
-    
+
     if (description) {
         query.description = {
             $regex: description,
