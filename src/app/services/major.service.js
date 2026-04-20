@@ -15,6 +15,11 @@ export const createMajorService = async (data) => {
         abort(404, 'Không tìm thấy trường đại học.')
     }
 
+    const majorCount = await Major.countDocuments({ university_id })
+    if (majorCount >= existingUniversity.majors) {
+        abort(400, `Trường đại học này đã đạt giới hạn số lượng ngành học (${existingUniversity.majors} ngành).`)
+    }
+
     const newMajor = await Major.create({
         code,
         name,
