@@ -55,7 +55,12 @@ admissionMethodRouter.use(asyncHandler(authMiddleware.checkValidToken))
 admissionMethodRouter.get(
     '/',
     asyncHandler(validate(admissionMethodRequest.getList)),
-    asyncHandler(admissionMethodController.readRoot)
+    asyncHandler(admissionMethodController.getAdmissionMethodBySearchController)
+)
+
+admissionMethodRouter.get(
+    '/paging',
+    asyncHandler(admissionMethodController.getAdmissionMethodByPagesController)
 )
 
 /**
@@ -79,7 +84,7 @@ admissionMethodRouter.get(
 admissionMethodRouter.get(
     '/:admissionMethodId',
     asyncHandler(admissionMethodMiddleware.checkAdmissionMethodId),
-    asyncHandler(admissionMethodController.getDetail)
+    asyncHandler(admissionMethodController.getAdmissionMethodByIdController)
 )
 
 /**
@@ -119,7 +124,7 @@ admissionMethodRouter.post(
     '/',
     asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(validate(admissionMethodRequest.createItem)),
-    asyncHandler(admissionMethodController.createItem)
+    asyncHandler(admissionMethodController.createAdmissionMethodController)
 )
 
 /**
@@ -161,7 +166,7 @@ admissionMethodRouter.put(
     asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(admissionMethodMiddleware.checkAdmissionMethodId),
     asyncHandler(validate(admissionMethodRequest.updateItem)),
-    asyncHandler(admissionMethodController.updateItem)
+    asyncHandler(admissionMethodController.updateAdmissionMethodController)
 )
 
 /**
@@ -186,7 +191,7 @@ admissionMethodRouter.delete(
     '/:admissionMethodId',
     asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
     asyncHandler(admissionMethodMiddleware.checkAdmissionMethodId),
-    asyncHandler(admissionMethodController.deleteItem)
+    asyncHandler(admissionMethodController.deleteAdmissionMethodController)
 )
 
 export default admissionMethodRouter
