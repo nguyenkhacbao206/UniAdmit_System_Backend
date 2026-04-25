@@ -1,9 +1,9 @@
 import * as majorMiddleware from '@/app/middleware/admin/major.middleware'
 import * as majorRequest from '@/app/requests/admin/major.request'
 import * as majorController from '@/app/controllers/admin/major.controller'
-import * as authMiddleware from '@/app/middleware/admin/auth.middleware'
+import { globalAuth } from '@/app/middleware/globalAuth.middleware'
 import { asyncHandler } from '@/utils/helpers'
-import { requireRole } from '@/app/middleware/permission'
+import { allowAccountTypes, requireAdminRoles } from '@/app/middleware/permission'
 import { Router } from 'express'
 import validate from '@/app/middleware/admin/validate'
 
@@ -16,7 +16,7 @@ const majorRouter = Router()
  *   description: Major management for admins
  */
 
-majorRouter.use(asyncHandler(authMiddleware.checkValidToken))
+majorRouter.use(asyncHandler(globalAuth))
 
 /**
  * @swagger
@@ -32,11 +32,13 @@ majorRouter.use(asyncHandler(authMiddleware.checkValidToken))
  */
 majorRouter.get(
     '/',
+    asyncHandler(allowAccountTypes('admin', 'user')),
     asyncHandler(majorController.getMajorController)
 )
 
 majorRouter.get(
     '/page',
+    asyncHandler(allowAccountTypes('admin', 'user')),
     asyncHandler(majorController.getMajorByPage)
 )
 
@@ -60,6 +62,7 @@ majorRouter.get(
  */
 majorRouter.get(
     '/search',
+    asyncHandler(allowAccountTypes('admin', 'user')),
     asyncHandler(majorController.getMajorBySearchController)
 )
 
@@ -83,6 +86,7 @@ majorRouter.get(
  */
 majorRouter.get(
     '/:id',
+    asyncHandler(allowAccountTypes('admin', 'user')),
     asyncHandler(majorMiddleware.checkMajorId),
     asyncHandler(majorController.getMajorByIdController)
 )
@@ -138,7 +142,8 @@ majorRouter.get(
  */
 majorRouter.post(
     '/',
-    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
+    asyncHandler(allowAccountTypes('admin')),
+    asyncHandler(requireAdminRoles('super-admin', 'admin-manager')),
     asyncHandler(validate(majorRequest.createItem)),
     asyncHandler(majorController.createMajorController)
 )
@@ -194,7 +199,8 @@ majorRouter.post(
  */
 majorRouter.put(
     '/:id',
-    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
+    asyncHandler(allowAccountTypes('admin')),
+    asyncHandler(requireAdminRoles('super-admin', 'admin-manager')),
     asyncHandler(majorMiddleware.checkMajorId),
     asyncHandler(validate(majorRequest.updateItem)),
     asyncHandler(majorController.updateMajorController)
@@ -220,7 +226,8 @@ majorRouter.put(
  */
 majorRouter.delete(
     '/:id',
-    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
+    asyncHandler(allowAccountTypes('admin')),
+    asyncHandler(requireAdminRoles('super-admin', 'admin-manager')),
     asyncHandler(majorMiddleware.checkMajorId),
     asyncHandler(majorController.daleteMajorController)
 )

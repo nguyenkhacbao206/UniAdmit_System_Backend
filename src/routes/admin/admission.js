@@ -2,9 +2,9 @@ import { Router } from 'express'
 import * as admissionMethodMiddleware from '@/app/middleware/admin/admission-method.middleware'
 import * as admissionMethodRequest from '@/app/requests/admin/admission-method.request'
 import * as admissionMethodController from '@/app/controllers/admin/admission-method.controller'
-import * as authMiddleware from '@/app/middleware/admin/auth.middleware'
+import { globalAuth } from '@/app/middleware/globalAuth.middleware'
 import { asyncHandler } from '@/utils/helpers'
-import { requireRole } from '@/app/middleware/permission'
+import { allowAccountTypes, requireAdminRoles } from '@/app/middleware/permission'
 import validate from '@/app/middleware/admin/validate'
 
 const admissionMethodRouter = Router()
@@ -16,7 +16,7 @@ const admissionMethodRouter = Router()
  *   description: Admission method management for admins
  */
 
-admissionMethodRouter.use(asyncHandler(authMiddleware.checkValidToken))
+admissionMethodRouter.use(asyncHandler(globalAuth))
 
 /**
  * @swagger
@@ -54,12 +54,14 @@ admissionMethodRouter.use(asyncHandler(authMiddleware.checkValidToken))
  */
 admissionMethodRouter.get(
     '/',
+    asyncHandler(allowAccountTypes('admin', 'user')),
     asyncHandler(validate(admissionMethodRequest.getList)),
     asyncHandler(admissionMethodController.getAdmissionMethodBySearchController)
 )
 
 admissionMethodRouter.get(
     '/paging',
+    asyncHandler(allowAccountTypes('admin', 'user')),
     asyncHandler(admissionMethodController.getAdmissionMethodByPagesController)
 )
 
@@ -83,6 +85,7 @@ admissionMethodRouter.get(
  */
 admissionMethodRouter.get(
     '/:admissionMethodId',
+    asyncHandler(allowAccountTypes('admin', 'user')),
     asyncHandler(admissionMethodMiddleware.checkAdmissionMethodId),
     asyncHandler(admissionMethodController.getAdmissionMethodByIdController)
 )
@@ -122,7 +125,8 @@ admissionMethodRouter.get(
  */
 admissionMethodRouter.post(
     '/',
-    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
+    asyncHandler(allowAccountTypes('admin')),
+    asyncHandler(requireAdminRoles('super-admin', 'admin-manager')),
     asyncHandler(validate(admissionMethodRequest.createItem)),
     asyncHandler(admissionMethodController.createAdmissionMethodController)
 )
@@ -163,7 +167,8 @@ admissionMethodRouter.post(
  */
 admissionMethodRouter.put(
     '/:admissionMethodId',
-    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
+    asyncHandler(allowAccountTypes('admin')),
+    asyncHandler(requireAdminRoles('super-admin', 'admin-manager')),
     asyncHandler(admissionMethodMiddleware.checkAdmissionMethodId),
     asyncHandler(validate(admissionMethodRequest.updateItem)),
     asyncHandler(admissionMethodController.updateAdmissionMethodController)
@@ -189,7 +194,8 @@ admissionMethodRouter.put(
  */
 admissionMethodRouter.delete(
     '/:admissionMethodId',
-    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
+    asyncHandler(allowAccountTypes('admin')),
+    asyncHandler(requireAdminRoles('super-admin', 'admin-manager')),
     asyncHandler(admissionMethodMiddleware.checkAdmissionMethodId),
     asyncHandler(admissionMethodController.deleteAdmissionMethodController)
 )

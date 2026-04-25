@@ -1,9 +1,9 @@
 import * as enrollmentMiddleware from '@/app/middleware/admin/enrollment.middleware'
 import * as enrollmentRequest from '@/app/requests/admin/enrollment.request'
 import * as enrollmentController from '@/app/controllers/admin/enrollment.controller'
-import * as authMiddleware from '@/app/middleware/admin/auth.middleware'
 import { asyncHandler } from '@/utils/helpers'
-import { requireRole } from '@/app/middleware/permission'
+import { allowAccountTypes, requireAdminRoles } from '@/app/middleware/permission'
+import { globalAuth } from '@/app/middleware/globalAuth.middleware'
 import { Router } from 'express'
 import validate from '@/app/middleware/admin/validate'
 
@@ -16,7 +16,7 @@ const enrollmentRouter = Router()
  *   description: Enrollment management for admins
  */
 
-enrollmentRouter.use(asyncHandler(authMiddleware.checkValidToken))
+enrollmentRouter.use(asyncHandler(globalAuth))
 
 /**
  * @swagger
@@ -155,7 +155,8 @@ enrollmentRouter.get(
  */
 enrollmentRouter.post(
     '/',
-    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
+    asyncHandler(allowAccountTypes('admin')),
+    asyncHandler(requireAdminRoles('super-admin', 'admin-manager')),
     asyncHandler(validate(enrollmentRequest.createRequest)),
     asyncHandler(enrollmentController.createEnollmentController)
 )
@@ -208,7 +209,8 @@ enrollmentRouter.post(
  */
 enrollmentRouter.put(
     '/:id',
-    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
+    asyncHandler(allowAccountTypes('admin')),
+    asyncHandler(requireAdminRoles('super-admin', 'admin-manager')),
     asyncHandler(enrollmentMiddleware.checkEnrollmentId),
     asyncHandler(validate(enrollmentRequest.updateRequest)),
     asyncHandler(enrollmentController.updateEnrollmentController)
@@ -234,7 +236,8 @@ enrollmentRouter.put(
  */
 enrollmentRouter.delete(
     '/:id',
-    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
+    asyncHandler(allowAccountTypes('admin')),
+    asyncHandler(requireAdminRoles('super-admin', 'admin-manager')),
     asyncHandler(enrollmentMiddleware.checkEnrollmentId),
     asyncHandler(enrollmentController.deleteEnrollmentController)
 )

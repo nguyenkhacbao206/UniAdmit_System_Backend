@@ -1,9 +1,9 @@
 import { Router } from 'express'
 import * as staffController from '@/app/controllers/admin/staff.controller'
 import * as staffRequest from '@/app/requests/admin/staff.request'
-import * as authMiddleware from '@/app/middleware/admin/auth.middleware'
 import { asyncHandler } from '@/utils/helpers'
-import { requireRole } from '@/app/middleware/permission'
+import { allowAccountTypes, requireAdminRoles } from '@/app/middleware/permission'
+import { globalAuth } from '@/app/middleware/globalAuth.middleware'
 import validate from '@/app/middleware/admin/validate'
 
 const staffRouter = Router()
@@ -15,7 +15,7 @@ const staffRouter = Router()
  *   description: Staff management for admins
  */
 
-staffRouter.use(asyncHandler(authMiddleware.checkValidToken))
+staffRouter.use(asyncHandler(globalAuth))
 
 /**
  * @swagger
@@ -29,7 +29,7 @@ staffRouter.use(asyncHandler(authMiddleware.checkValidToken))
  *       200:
  *         description: List of staff
  */
-staffRouter.get('/', asyncHandler(requireRole(['super-admin'])), asyncHandler(staffController.getStaffs))
+staffRouter.get('/', asyncHandler(allowAccountTypes('admin')), asyncHandler(requireAdminRoles('super-admin')), asyncHandler(staffController.getStaffs))
 
 /**
  * @swagger
@@ -45,7 +45,8 @@ staffRouter.get('/', asyncHandler(requireRole(['super-admin'])), asyncHandler(st
  */
 staffRouter.post(
     '/', 
-    asyncHandler(requireRole(['super-admin'])), 
+    asyncHandler(allowAccountTypes('admin')),
+    asyncHandler(requireAdminRoles('super-admin')),
     asyncHandler(validate(staffRequest.createStaff)), 
     asyncHandler(staffController.createStaff)
 )
@@ -61,7 +62,8 @@ staffRouter.post(
  */
 staffRouter.put(
     '/:id', 
-    asyncHandler(requireRole(['super-admin'])), 
+    asyncHandler(allowAccountTypes('admin')),
+    asyncHandler(requireAdminRoles('super-admin')),
     asyncHandler(validate(staffRequest.updateStaff)), 
     asyncHandler(staffController.updateStaff)
 )
@@ -75,6 +77,6 @@ staffRouter.put(
  *     security:
  *       - BearerAuth: []
  */
-staffRouter.delete('/:id', asyncHandler(requireRole(['super-admin'])), asyncHandler(staffController.deleteStaff))
+staffRouter.delete('/:id', asyncHandler(allowAccountTypes('admin')), asyncHandler(requireAdminRoles('super-admin')), asyncHandler(staffController.deleteStaff))
 
 export default staffRouter

@@ -1,9 +1,9 @@
 import * as universitiesMiddleware from '@/app/middleware/admin/universities.middleware'
 import * as universitiesRequest from '@/app/requests/admin/universities.request'
 import * as universitiesController from '@/app/controllers/admin/universities.controller'
-import * as authMiddleware from '@/app/middleware/admin/auth.middleware'
+import { globalAuth } from '@/app/middleware/globalAuth.middleware'
 import { asyncHandler } from '@/utils/helpers'
-import { requireRole } from '@/app/middleware/permission'
+import { allowAccountTypes, requireAdminRoles } from '@/app/middleware/permission'
 import { Router } from 'express'
 import validate from '@/app/middleware/admin/validate'
 
@@ -16,7 +16,8 @@ const universityRouter = Router()
  *   description: University management for admins
  */
 
-universityRouter.use(asyncHandler(authMiddleware.checkValidToken))
+universityRouter.use(
+    asyncHandler(globalAuth))
 
 /**
  * @swagger
@@ -50,12 +51,14 @@ universityRouter.use(asyncHandler(authMiddleware.checkValidToken))
  */
 universityRouter.get(
     '/',
+    asyncHandler(allowAccountTypes('admin', 'user')),
     asyncHandler(validate(universitiesRequest.getList)),
     asyncHandler(universitiesController.getUniversitiesController)
 )
 
 universityRouter.get(
     '/page',
+    asyncHandler(allowAccountTypes('admin', 'user')),
     asyncHandler(universitiesController.getUniversityByPage)
 )
 
@@ -83,6 +86,7 @@ universityRouter.get(
  */
 universityRouter.get(
     '/:id',
+    asyncHandler(allowAccountTypes('admin', 'user')),
     asyncHandler(universitiesMiddleware.checkUniversityId),
     asyncHandler(universitiesController.getUniversityByIdController)
 )
@@ -126,7 +130,8 @@ universityRouter.get(
  */
 universityRouter.post(
     '/',
-    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
+    asyncHandler(allowAccountTypes('admin')),
+    asyncHandler(requireAdminRoles('super-admin', 'admin-manager')),
     asyncHandler(validate(universitiesRequest.createItem)),
     asyncHandler(universitiesController.createUniversitiesController)
 )
@@ -174,7 +179,8 @@ universityRouter.post(
  */
 universityRouter.put(
     '/:id',
-    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
+    asyncHandler(allowAccountTypes('admin')),
+    asyncHandler(requireAdminRoles('super-admin', 'admin-manager')),
     asyncHandler(universitiesMiddleware.checkUniversityId),
     asyncHandler(validate(universitiesRequest.updateItem)),
     asyncHandler(universitiesController.updateUniversitiesController)
@@ -200,7 +206,8 @@ universityRouter.put(
  */
 universityRouter.delete(
     '/:id',
-    asyncHandler(requireRole(['super-admin', 'admin-manager'], 'admin')),
+    asyncHandler(allowAccountTypes('admin')),
+    asyncHandler(requireAdminRoles('super-admin', 'admin-manager')),
     asyncHandler(universitiesMiddleware.checkUniversityId),
     asyncHandler(universitiesController.deleteUniversitiesController)
 )
