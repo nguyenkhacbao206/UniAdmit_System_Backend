@@ -10,7 +10,7 @@ export async function updateUserProfile(userId, profileData) {
 
     // Update thông tin cơ bản ở User (nếu có)
     const userFields = ['name', 'phone', 'email', 'avatar', 'gender', 'dob', 'address']
-    const userData = _.omitBy(_.pick(profileData, userFields), _.isNil)
+    const userData = _.omitBy(_.pick(profileData, userFields), (v) => _.isNil(v) || v === '')
     
     if (userData.email && userData.email !== user.email) {
         const existEmail = await User.findOne({ email: userData.email, _id: { $ne: userId }, deleted: false })
