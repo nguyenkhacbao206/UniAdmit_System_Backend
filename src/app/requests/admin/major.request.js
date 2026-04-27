@@ -30,7 +30,16 @@ export const createItem = Joi.object({
         .valid('4 năm', '5 năm', '6 năm', '7 năm', '8 năm')
         .default('4 năm')
         .label('Thời gian đào tạo'),
-    status: Joi.string().valid('active', 'inactive').default('active').label('Trạng thái')
+    status: Joi.string().valid('active', 'inactive').default('active').label('Trạng thái'),
+    groups: Joi.array().items(Joi.string().trim()).default([]).label('Khối xét tuyển'),
+    careers: Joi.array().items(Joi.string().trim()).default([]).label('Cơ hội nghề nghiệp'),
+    curriculum: Joi.array().items(Joi.string().trim()).default([]).label('Chương trình đào tạo'),
+    benchmarks: Joi.array().items(Joi.object({
+        year: Joi.number().integer().required(),
+        value: Joi.number().required(),
+        quota: Joi.number().integer().optional()
+    })).default([]).label('Điểm chuẩn'),
+    employment_rate: Joi.string().trim().default('0%').label('Tỷ lệ có việc làm')
 })
 
 export const updateItem = Joi.object({
@@ -60,7 +69,16 @@ export const updateItem = Joi.object({
         .valid('4 năm', '5 năm', '6 năm', '7 năm', '8 năm')
         .default('4 năm')
         .label('Thời gian đào tạo'),
-    status: Joi.string().valid('active', 'inactive').default('active').label('Trạng thái')
+    status: Joi.string().valid('active', 'inactive').default('active').label('Trạng thái'),
+    groups: Joi.array().items(Joi.string().trim()).default([]).label('Khối xét tuyển'),
+    careers: Joi.array().items(Joi.string().trim()).default([]).label('Cơ hội nghề nghiệp'),
+    curriculum: Joi.array().items(Joi.string().trim()).default([]).label('Chương trình đào tạo'),
+    benchmarks: Joi.array().items(Joi.object({
+        year: Joi.number().integer().required(),
+        value: Joi.number().required(),
+        quota: Joi.number().integer().optional()
+    })).default([]).label('Điểm chuẩn'),
+    employment_rate: Joi.string().trim().default('0%').label('Tỷ lệ có việc làm')
 })
 
 export const getList = Joi.object({
@@ -68,5 +86,8 @@ export const getList = Joi.object({
     page: tryValidateOrDefault(Joi.number().integer().min(1), 1),
     per_page: tryValidateOrDefault(Joi.number().integer().min(1).max(100), 50),
     code: tryValidateOrDefault(Joi.string().trim(), ''),
-    name: tryValidateOrDefault(Joi.string().trim(), '')
+    name: tryValidateOrDefault(Joi.string().trim(), ''),
+    university_id: tryValidateOrDefault(Joi.string().trim(), ''),
+    category: tryValidateOrDefault(Joi.string().trim(), ''),
+    keyword: tryValidateOrDefault(Joi.string().trim(), '')
 })
