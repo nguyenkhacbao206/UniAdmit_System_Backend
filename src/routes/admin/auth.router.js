@@ -1,7 +1,7 @@
 import {Router} from 'express'
 import {asyncHandler} from '@/utils/helpers'
 import validate from '@/app/middleware/admin/validate'
-import * as authMiddleware from '@/app/middleware/admin/auth.middleware'
+import { globalAuth } from '@/app/middleware/globalAuth.middleware'
 import * as authRequest from '@/app/requests/admin/auth.request'
 import * as authController from '@/app/controllers/admin/auth.controller'
 
@@ -54,7 +54,7 @@ authRouter.post(
  */
 authRouter.post(
     '/logout',
-    asyncHandler(authMiddleware.checkValidToken),
+    asyncHandler(globalAuth),
     asyncHandler(authController.logout)
 )
 
@@ -101,7 +101,7 @@ authRouter.post(
  */
 authRouter.get(
     '/me',
-    asyncHandler(authMiddleware.checkValidToken),
+    asyncHandler(globalAuth),
     asyncHandler(authController.me)
 )
 

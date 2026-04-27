@@ -2,12 +2,12 @@ import express from 'express'
 import * as profileController from '@/app/controllers/user/profile.controller'
 import validate from '@/app/middleware/user/validate'
 import * as profileRequest from '@/app/requests/user/profile.request'
-import { checkValidToken } from '@/app/middleware/user/auth.middleware'
+import { globalAuth } from '@/app/middleware/globalAuth.middleware'
 import { asyncHandler } from '@/utils/helpers'
 
 const router = express.Router()
 
-router.use(asyncHandler(checkValidToken))
+router.use(asyncHandler(globalAuth))
 
 /**
  * @swagger

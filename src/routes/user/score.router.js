@@ -2,13 +2,13 @@ import express from 'express'
 import * as scoreController from '@/app/controllers/user/score.controller'
 import * as scoreRequest from '@/app/requests/user/score.request'
 import validate from '@/app/middleware/user/validate'
-import { checkValidToken } from '@/app/middleware/user/auth.middleware'
+import { globalAuth } from '@/app/middleware/globalAuth.middleware'
 import { asyncHandler } from '@/utils/helpers'
 
 const router = express.Router()
 
 // Tất cả các route yêu cầu đăng nhập
-router.use(asyncHandler(checkValidToken))
+router.use(asyncHandler(globalAuth))
 
 /**
  * @swagger

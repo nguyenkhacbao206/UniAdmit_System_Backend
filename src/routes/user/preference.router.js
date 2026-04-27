@@ -1,7 +1,7 @@
 import * as preferenceController from '@/app/controllers/user/preference.controller.js'
 import * as preferenceRequest from '@/app/requests/user/preference.request.js'
 import * as preferenceMiddleware from '@/app/middleware/user/preference.middleware.js'
-import * as authMiddleware from '@/app/middleware/user/auth.middleware.js'
+import { globalAuth } from '@/app/middleware/globalAuth.middleware.js'
 import validate from '@/app/middleware/user/validate.js'
 import {asyncHandler} from '@/utils/helpers'
 import {Router} from 'express'
@@ -15,7 +15,7 @@ const preferenceRouter = Router()
  *   description: Management of user admission preferences
  */
 
-preferenceRouter.use(asyncHandler(authMiddleware.checkValidToken))
+preferenceRouter.use(asyncHandler(globalAuth))
 
 /**
  * @swagger

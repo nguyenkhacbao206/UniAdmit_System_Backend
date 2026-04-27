@@ -3,11 +3,11 @@ import * as staffController from '@/app/controllers/staff/staff.controller'
 import * as staffRequest from '@/app/requests/staff/staff.request'
 import { asyncHandler } from '@/utils/helpers'
 import validate from '@/app/middleware/admin/validate'
-import * as staffAuth from '@/app/middleware/staff/auth.middleware'
+import { globalAuth } from '@/app/middleware/globalAuth.middleware'
 
 const staffRouter = Router()
 
-staffRouter.use(asyncHandler(staffAuth.checkValidToken))
+staffRouter.use(asyncHandler(globalAuth))
 
 /**
  * @swagger
