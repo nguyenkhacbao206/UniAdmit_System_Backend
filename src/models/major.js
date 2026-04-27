@@ -52,6 +52,29 @@ const Major = createModel(
             enum: ['active', 'inactive'],
             required: true,
             default: 'active',
+        },
+
+        groups: [{
+            type: String // e.g., 'A00', 'A01'
+        }],
+
+        careers: [{
+            type: String
+        }],
+
+        curriculum: [{
+            type: String
+        }],
+
+        benchmarks: [{
+            year: Number,
+            value: Number,
+            quota: Number
+        }],
+
+        employment_rate: {
+            type: String,
+            default: '0%'
         }
 
     },
