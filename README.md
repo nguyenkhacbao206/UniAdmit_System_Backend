@@ -81,13 +81,13 @@ npm start
 
 ---
 
-## 🔐 Tài khoản mặc định (Sau khi Seed)
+<!-- ## 🔐 Tài khoản mặc định (Sau khi Seed)
 
 | Vai trò | Số điện thoại | Mật khẩu |
 | :--- | :--- | :--- |
 | **Quản trị viên** | `0987654321` | `Z3ntSoft@D3v` |
 
----
+--- -->
 
 ## 📖 Tài liệu API
 Sau khi chạy ứng dụng, bạn có thể truy cập Swagger UI tại:
@@ -96,6 +96,6 @@ Sau khi chạy ứng dụng, bạn có thể truy cập Swagger UI tại:
 ---
 
 ## 🤝 Liên hệ & Hỗ trợ
-Phát triển bởi [ZentSoft](https://zentsoft.com) và cộng sự.
+Phát triển bởi [Nguyễn Khắc Bảo](https://github.com/nguyenkhacbao206) và cộng sự.
 
 © 2026 UniAdmit System. All rights reserved.
