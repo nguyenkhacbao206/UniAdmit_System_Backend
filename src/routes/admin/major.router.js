@@ -32,13 +32,13 @@ majorRouter.use(asyncHandler(globalAuth))
  */
 majorRouter.get(
     '/',
-    asyncHandler(allowAccountTypes('admin', 'user')),
+    asyncHandler(allowAccountTypes('admin', 'user', 'staff')),
     asyncHandler(majorController.getMajorController)
 )
 
 majorRouter.get(
     '/page',
-    asyncHandler(allowAccountTypes('admin', 'user')),
+    asyncHandler(allowAccountTypes('admin', 'user', 'staff')),
     asyncHandler(majorController.getMajorByPage)
 )
 
@@ -62,7 +62,7 @@ majorRouter.get(
  */
 majorRouter.get(
     '/search',
-    asyncHandler(allowAccountTypes('admin', 'user')),
+    asyncHandler(allowAccountTypes('admin', 'user', 'staff')),
     asyncHandler(majorController.getMajorBySearchController)
 )
 
@@ -86,7 +86,7 @@ majorRouter.get(
  */
 majorRouter.get(
     '/:id',
-    asyncHandler(allowAccountTypes('admin', 'user')),
+    asyncHandler(allowAccountTypes('admin', 'user', 'staff')),
     asyncHandler(majorMiddleware.checkMajorId),
     asyncHandler(majorController.getMajorByIdController)
 )
@@ -143,7 +143,7 @@ majorRouter.get(
 majorRouter.post(
     '/',
     asyncHandler(allowAccountTypes('admin')),
-    asyncHandler(requireAdminRoles('super-admin', 'admin-manager')),
+    asyncHandler(requireAdminRoles('super-admin', 'admin-manager',)),
     asyncHandler(validate(majorRequest.createItem)),
     asyncHandler(majorController.createMajorController)
 )

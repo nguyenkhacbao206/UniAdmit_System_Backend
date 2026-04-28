@@ -1,13 +1,32 @@
 import mongoose from 'mongoose'
 
 export default function createModel(name, collection, definition, options) {
+    const { virtuals, methods, ...restOptions } = options ?? {}
     const schema = new mongoose.Schema(definition, {
         timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
         versionKey: false,
         id: false,
         toJSON: { getters: true, virtuals: true },
-        ...(options ?? {}),
+        ...restOptions,
     })
+
+    if (virtuals) {
+        Object.keys(virtuals).forEach((key) => {
+            const virtual = virtuals[key]
+            if (virtual.ref || virtual.options) {
+                schema.virtual(key, virtual.options || virtual)
+            } else {
+                if (virtual.get) schema.virtual(key).get(virtual.get)
+                if (virtual.set) schema.virtual(key).set(virtual.set)
+            }
+        })
+    }
+
+    if (methods) {
+        Object.keys(methods).forEach((key) => {
+            schema.methods[key] = methods[key]
+        })
+    }
 
     return mongoose.model(name, schema, collection)
 }

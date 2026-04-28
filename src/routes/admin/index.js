@@ -6,6 +6,7 @@ import universityRouter from './universities.router'
 import majorRouter from './major.router'
 import enrollmentRouter from './enrollment.router'
 import admissionMethodRouter from './admission'
+import surveyRouter from './survey.router'
 
 const admin = Router()
 
@@ -16,5 +17,6 @@ admin.use('/universities', universityRouter)
 admin.use('/majors', majorRouter)
 admin.use('/enrollments', enrollmentRouter)
 admin.use('/admission-method', admissionMethodRouter)
+admin.use('/survey', surveyRouter)
 
 export default admin

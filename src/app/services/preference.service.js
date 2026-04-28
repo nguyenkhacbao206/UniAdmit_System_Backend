@@ -102,6 +102,15 @@ class PreferenceService {
         return true
     }
 
+    // unlock
+    async unlock(userId) {
+        await User.findByIdAndUpdate(userId, {
+            isConfirmed: false
+        })
+
+        return true
+    }
+
     async getResult(userId) {
         const user = await User.findById(userId)
 

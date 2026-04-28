@@ -75,8 +75,40 @@ const Major = createModel(
         employment_rate: {
             type: String,
             default: '0%'
-        }
+        },
 
+        // --- Suggestion Module Fields ---
+        suitability_reason: {
+            type: String,
+            default: ''
+        },
+
+        advantages: [{
+            type: String
+        }],
+
+        disadvantages: [{
+            type: String
+        }],
+
+        tuition: {
+            type: String,
+            default: 'Đang cập nhật'
+        },
+
+        career_opportunities: [{
+            type: String
+        }],
+
+        career_trends: {
+            type: String,
+            default: ''
+        },
+
+        is_suggestion_published: {
+            type: Boolean,
+            default: false
+        }
     },
     {
         toJSON: {
@@ -89,12 +121,10 @@ const Major = createModel(
         },
         virtuals: {
             university: {
-                options: {
-                    ref: 'University',
-                    localField: 'university_id',
-                    foreignField: '_id',
-                    justOne: true,
-                },
+                ref: 'University',
+                localField: 'university_id',
+                foreignField: '_id',
+                justOne: true,
             },
         },
     },
