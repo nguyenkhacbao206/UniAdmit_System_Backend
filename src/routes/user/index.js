@@ -5,6 +5,7 @@ import scoreRouter from './score.router'
 import academicScoreRouter from './academic-score.router'
 
 import preferenceRouter from './preference.router'
+import surveyRouter from './survey.router'
 
 const user = Router()
 
@@ -13,6 +14,7 @@ user.use('/profile', profileRouter)
 user.use('/scores', scoreRouter)
 user.use('/academic-scores', academicScoreRouter)
 user.use('/preferences', preferenceRouter)
+user.use('/survey', surveyRouter)
 
 
 

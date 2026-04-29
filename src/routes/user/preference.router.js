@@ -121,6 +121,23 @@ preferenceRouter.post(
 
 /**
  * @swagger
+ * /user/preferences/unlock:
+ *   post:
+ *     tags: [User Preference]
+ *     summary: Unlock preferences for editing
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Unlocked successfully
+ */
+preferenceRouter.post(
+    '/unlock',
+    asyncHandler(preferenceController.unlock)
+)
+
+/**
+ * @swagger
  * /user/preferences/result:
  *   get:
  *     tags: [User Preference]

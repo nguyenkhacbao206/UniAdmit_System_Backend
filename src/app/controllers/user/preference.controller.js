@@ -101,6 +101,25 @@ export const confirm = async (req, res) => {
 }
 
 
+export const unlock = async (req, res) => {
+    try {
+        const userId = req.currentUser._id
+
+        await PreferenceService.unlock(userId)
+
+        res.json({
+            success: true,
+            message: 'Đã mở khóa danh sách nguyện vọng'
+        })
+    } catch (err) {
+        res.status(400).json({
+            success: false,
+            message: err.message
+        })
+    }
+}
+
+
 export const getResult = async (req, res) => {
     try {
         const userId = req.currentUser._id

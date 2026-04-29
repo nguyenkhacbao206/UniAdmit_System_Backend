@@ -73,20 +73,23 @@ export const getMajorByIdService = async (id) => {
 
     const calculateDeltas = (benchmarks) => {
         if (!benchmarks || benchmarks.length === 0) return []
-        const sorted = [...benchmarks].sort((a, b) => a.year - b.year)
+        const sorted = [...benchmarks].sort((a, b) => b.year - a.year) // Sort descending to get latest years
+
         return sorted.map((item, index) => {
             const result = item.toObject ? item.toObject() : { ...item }
             result.valueDelta = null
             result.quotaDelta = null
-            if (index > 0) {
-                const prev = sorted[index - 1]
-                if (item.value !== 'undefined' && prev.value !== 'undefined') {
+
+            // Compare with the year before it (which is index + 1 because we sorted descending)
+            const prev = sorted[index + 1]
+            if (prev) {
+                if (typeof item.value === 'number' && typeof prev.value === 'number') {
                     const d = item.value - prev.value
                     result.valueDelta = d >= 0 ? `+${d.toFixed(1)}` : `${d.toFixed(1)}`
                 }
-                if (item.quota !== 'undefined' && prev.quota !== 'undefined') {
+                if (typeof item.quota === 'number' && typeof prev.quota === 'number') {
                     const d = item.quota - prev.quota
-                    result.quotaDelta = d >= 0 ? `+${d.toFixed(1)}` : `${d.toFixed(1)}`
+                    result.quotaDelta = d >= 0 ? `+${d}` : `${d}`
                 }
             }
             return result
@@ -94,18 +97,19 @@ export const getMajorByIdService = async (id) => {
     }
 
     // Process main major benchmarks
-    const majorObj = major.toObject()
+    const majorObj = major.toObject({ virtuals: true })
     majorObj.benchmarks = calculateDeltas(major.benchmarks)
 
-    // Tìm các trường khác cũng đào tạo ngành này
+    // Tìm các trường khác cũng đào tạo ngành này (so sánh theo tên ngành, bỏ qua hoa thường và khoảng trắng)
+    const cleanName = major.name.trim().replace(/\s+/g, '\\s+')
     const otherSchools = await Major.find({
-        name: { $regex: new RegExp(`^${major.name}$`, 'i') }, // Match exact name
+        name: { $regex: new RegExp(`^${cleanName}$`, 'i') },
         _id: { $ne: major._id },
         status: 'active'
     }).populate('university', 'name code location')
 
     const otherSchoolsProcessed = otherSchools.map(s => {
-        const sObj = s.toObject()
+        const sObj = s.toObject({ virtuals: true })
         sObj.benchmarks = calculateDeltas(s.benchmarks)
         return sObj
     })
@@ -188,9 +192,9 @@ export const getMajorBySearch = async (data) => {
     ])
 
     const results = await Promise.all(majorSearch.map(async (m) => {
-        const count = await Major.countDocuments({ 
-            name: { $regex: new RegExp(`^${m.name}$`, 'i') }, 
-            status: 'active' 
+        const count = await Major.countDocuments({
+            name: { $regex: new RegExp(`^${m.name}$`, 'i') },
+            status: 'active'
         })
         const mObj = m.toObject()
         mObj.schoolCount = count
