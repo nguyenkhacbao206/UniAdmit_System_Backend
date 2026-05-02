@@ -5,8 +5,6 @@ import Major from '@/models/major'
 
 class SurveyService {
 
-    // --- Staff Actions ---
-
     async createQuestion(data, staffId) {
         return await SurveyQuestion.create({
             ...data,
@@ -42,13 +40,13 @@ class SurveyService {
             .sort({ order: 1 })
     }
 
-    // --- Admin Actions ---
+    // admin approve question
 
     async approveQuestion(id) {
         return await SurveyQuestion.findByIdAndUpdate(id, { status: 'published' }, { new: true })
     }
 
-    // --- User Actions ---
+    //  User Actions 
 
     async getPublishedQuestions() {
         return await SurveyQuestion.find({ status: 'published' })
@@ -58,7 +56,7 @@ class SurveyService {
 
     async submitSurvey(userId, answers) {
         // answers: [{ questionId, optionId }]
-        
+
         const majorScoresMap = {} // { majorId: score }
 
         for (const ans of answers) {
@@ -82,7 +80,7 @@ class SurveyService {
         }
 
         const bestMatch = majorScoresArray[0]
-        
+
         // Match percentage calculation
         const matchPercentage = Math.min(100, (bestMatch.totalScore / (answers.length * 3)) * 100)
 
@@ -110,7 +108,7 @@ class SurveyService {
             { $sort: { count: -1 } },
             { $limit: 10 }
         ])
-        
+
         return {
             totalUser,
             topSuggested: suggestedStats
