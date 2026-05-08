@@ -1,6 +1,14 @@
 import { Enrollment } from '@/models'
 import { abort } from '@/utils/helpers'
 
+const autoCloseExpiredEnrollments = async () => {
+    const now = new Date()
+    await Enrollment.updateMany(
+        { status: 'open', endDate: { $lt: now } },
+        { $set: { status: 'close' } }
+    )
+}
+
 export const createEnrollmentService = async (data) => {
     const { code, name, year, status, startDate, endDate } = data
 
@@ -23,11 +31,13 @@ export const createEnrollmentService = async (data) => {
 }
 
 export const getEnrollmentService = async () => {
+    await autoCloseExpiredEnrollments()
     const enrollment = await Enrollment.find()
     return enrollment
 }
 
 export const getEnrollmentByIdService = async (id) => {
+    await autoCloseExpiredEnrollments()
     const enrollment = await Enrollment.findById(id)
 
     if (!enrollment) {
@@ -62,6 +72,7 @@ export const deleteEnrollment = async (id) => {
 }
 
 export const getEnrollmentBySearch = async (data) => {
+    await autoCloseExpiredEnrollments()
     const { code, name, year } = data
     const query = {}
 
@@ -92,6 +103,7 @@ export const getEnrollmentBySearch = async (data) => {
 }
 
 export const getEnrollmentByPages = async (data) => {
+    await autoCloseExpiredEnrollments()
     const { page = 1, limit = 10 } = data
 
     const pageNum = Number(page)
