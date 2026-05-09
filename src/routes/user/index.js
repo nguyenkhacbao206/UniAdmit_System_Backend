@@ -6,6 +6,8 @@ import academicScoreRouter from './academic-score.router'
 
 import preferenceRouter from './preference.router'
 import surveyRouter from './survey.router'
+import paymentRouter from './payment.router'
+import enrollmentRouter from './enrollment.router'
 
 const user = Router()
 
@@ -15,6 +17,8 @@ user.use('/scores', scoreRouter)
 user.use('/academic-scores', academicScoreRouter)
 user.use('/preferences', preferenceRouter)
 user.use('/survey', surveyRouter)
+user.use('/payment', paymentRouter)
+user.use('/enrollment', enrollmentRouter)
 
 
 
