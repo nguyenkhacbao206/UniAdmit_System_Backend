@@ -26,7 +26,7 @@ export async function updateUserProfile(userId, profileData) {
     await user.save()
 
     // Update thông tin chi tiết ở Profile
-    const profileFields = ['ethnicity', 'gender', 'dob', 'permanentAddress', 'contactAddress', 'cccd', 'place_of_issue', 'avatar', 'cv', 'school', 'score', 'rank']
+    const profileFields = ['ethnicity', 'gender', 'dob', 'permanentAddress', 'contactAddress', 'cccd', 'place_of_issue', 'avatar', 'cv', 'school', 'score', 'rank', 'cccd_doc', 'transcript_doc']
     const detailData = _.omitBy(_.pick(profileData, profileFields), _.isNil)
     
     let profile = await Profile.findOne({ user_id: userId })
@@ -98,4 +98,13 @@ export async function updateCV(userId, cvPath) {
         { new: true, upsert: true }
     )
     return profile.cv
+}
+
+export async function updateDocument(userId, field, path) {
+    const profile = await Profile.findOneAndUpdate(
+        { user_id: userId },
+        { [field]: path },
+        { new: true, upsert: true }
+    )
+    return profile[field]
 }

@@ -181,4 +181,37 @@ router.patch('/avatar', asyncHandler(profileController.updateAvatar))
  */
 router.post('/cv', asyncHandler(profileController.uploadCV))
 
+/**
+ * @swagger
+ * /user/profile/document/{field}:
+ *   post:
+ *     tags: [User Profile]
+ *     summary: Tải lên tài liệu minh chứng theo trường
+ *     description: Tải lên file minh chứng (CCCD hoặc Bảng điểm).
+ *     parameters:
+ *       - in: path
+ *         name: field
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [cccd_doc, transcript_doc]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required: [file]
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Tải lên thành công.
+ */
+router.post('/document/:field', asyncHandler(profileController.uploadDocument))
+
 export default router

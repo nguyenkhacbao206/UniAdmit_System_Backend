@@ -57,6 +57,10 @@ const User = createModel(
             type: Boolean,
             default: false
         },
+        isSubmitted: {
+            type: Boolean,
+            default: false
+        },
 
         otp: {
             type: String,
