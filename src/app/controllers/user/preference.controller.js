@@ -9,6 +9,7 @@ export const getList = async (req, res) => {
 
         res.json({
             success: true,
+            isConfirmed: req.currentUser.isConfirmed,
             data
         })
     } catch (err) {
