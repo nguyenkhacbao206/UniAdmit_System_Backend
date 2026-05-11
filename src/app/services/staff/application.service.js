@@ -3,6 +3,7 @@ import User from '@/models/user.js'
 import Score from '@/models/score.js'
 import Profile from '@/models/profile.js'
 import AdmissionMethod from '@/models/admission-method.js'
+import NotificationService from '@/app/services/notification.service.js'
 
 class ApplicationService {
     async getList(query = {}) {
@@ -96,8 +97,59 @@ class ApplicationService {
         }
     }
 
-    async updateStatus(id, status) {
-        return await Preference.findByIdAndUpdate(id, { status }, { new: true })
+    async updateStatus(id, status, message) {
+        const preference = await Preference.findByIdAndUpdate(id, { status }, { new: true })
+            .populate('university major')
+
+        if (!preference) throw new Error('Không tìm thấy hồ sơ')
+
+        // Gửi thông báo real-time theo loại trạng thái
+        const userId = preference.userId
+        const majorName = preference.major?.name || 'Ngành đã đăng ký'
+        const uniName = preference.university?.name || 'Trường đã đăng ký'
+
+        const notifMap = {
+            additional_required: {
+                title: '📋 Yêu cầu bổ sung thông tin hồ sơ',
+                description: message
+                    ? `Hồ sơ ngành ${majorName} - ${uniName} cần bổ sung: ${message}`
+                    : `Hồ sơ ngành ${majorName} - ${uniName} cần bổ sung thông tin. Vui lòng kiểm tra và cập nhật.`,
+                type: 'additional_required'
+            },
+            approved: {
+                title: '✅ Hồ sơ đã được duyệt',
+                description: `Chúc mừng! Hồ sơ ngành ${majorName} - ${uniName} của bạn đã được duyệt thành công.`,
+                type: 'approved'
+            },
+            rejected: {
+                title: '❌ Hồ sơ bị từ chối',
+                description: message
+                    ? `Hồ sơ ngành ${majorName} - ${uniName} bị từ chối. Lý do: ${message}`
+                    : `Hồ sơ ngành ${majorName} - ${uniName} của bạn đã bị từ chối.`,
+                type: 'rejected'
+            }
+        }
+
+        const notifPayload = notifMap[status]
+        if (notifPayload && userId) {
+            try {
+                await NotificationService.createAndPush(userId, {
+                    ...notifPayload,
+                    metadata: {
+                        preferenceId: preference._id,
+                        applicationCode: preference.applicationCode,
+                        majorName,
+                        universityName: uniName,
+                        status
+                    }
+                })
+            } catch (notifErr) {
+                // Không throw lỗi notification, vẫn cập nhật status thành công
+                console.error('Notification send error:', notifErr.message)
+            }
+        }
+
+        return preference
     }
 }
 

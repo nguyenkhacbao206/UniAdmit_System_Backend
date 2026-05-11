@@ -18,8 +18,8 @@ export const getList = async (req, res) => {
 export const updateStatus = async (req, res) => {
     try {
         const { id } = req.params
-        const { status } = req.body
-        const data = await ApplicationService.updateStatus(id, status)
+        const { status, message } = req.body
+        const data = await ApplicationService.updateStatus(id, status, message)
         res.json({
             success: true,
             data,
