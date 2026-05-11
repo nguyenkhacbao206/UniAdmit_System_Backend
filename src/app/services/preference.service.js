@@ -95,6 +95,19 @@ class PreferenceService {
             throw new Error('Chưa có nguyện vọng')
         }
 
+        // Generate application codes if not already generated
+        for (let i = 0; i < preferences.length; i++) {
+            if (!preferences[i].applicationCode) {
+                // Find the total number of preferences with applicationCode to generate next
+                const count = await Preference.countDocuments({ applicationCode: { $exists: true } })
+                const nextCode = `APP${(count + 1).toString().padStart(3, '0')}`
+                
+                preferences[i].applicationCode = nextCode
+                preferences[i].status = 'pending'
+                await preferences[i].save()
+            }
+        }
+
         await User.findByIdAndUpdate(userId, {
             isConfirmed: true
         })

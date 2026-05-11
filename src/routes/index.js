@@ -4,6 +4,7 @@ import user from './user'
 import auth from './auth.router'
 import staff from './staff/staff.router'
 import staffSurvey from './staff/survey.router'
+import staffApplication from './staff/application.router'
 
 function route(app) {
     // Standard routes
@@ -11,6 +12,7 @@ function route(app) {
     app.use('/user', user)
     app.use('/auth', auth)
     app.use('/staff/survey', staffSurvey)
+    app.use('/staff/applications', staffApplication)
     app.use('/staff', staff)
 
     // API prefix routes for frontend compatibility
@@ -18,6 +20,7 @@ function route(app) {
     app.use('/api/user', user)
     app.use('/api/auth', auth)
     app.use('/api/staff/survey', staffSurvey)
+    app.use('/api/staff/applications', staffApplication)
     app.use('/api/staff', staff)
 }
 

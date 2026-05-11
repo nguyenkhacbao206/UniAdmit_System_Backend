@@ -31,6 +31,33 @@ const preferenceSchema = createModel(
         priority: {
             type: Number,
             required: true
+        },
+
+        status: {
+            type: String,
+            enum: ['pending', 'processing', 'approved', 'rejected', 'additional_required'],
+            default: 'pending'
+        },
+
+        applicationCode: {
+            type: String,
+            unique: true,
+            sparse: true
+        },
+
+        submittedAt: {
+            type: Date,
+            default: null
+        },
+
+        points: {
+            type: Number,
+            default: 0
+        },
+
+        combination: {
+            type: String,
+            default: ''
         }
     },
     {

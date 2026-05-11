@@ -1,8 +1,4 @@
-import * as enrollmentService from '@/app/services/enrollment.service'
-// import { message } from 'statuses'
-
-
-
+import enrollmentService from '@/app/services/enrollment.service'
 
 export const createEnollmentController = async (req, res) => {
     try {

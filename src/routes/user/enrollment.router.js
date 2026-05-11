@@ -1,15 +1,13 @@
 import { Router } from 'express'
 import * as enrollmentController from '@/app/controllers/user/enrollment.controller'
-import { globalAuth } from '@/app/middleware/globalAuth.middleware'
-import { allowAccountTypes } from '@/app/middleware/permission'
 import { asyncHandler } from '@/utils/helpers'
+import { globalAuth } from '@/app/middleware/globalAuth.middleware'
 
-const router = Router()
+const enrollmentRouter = Router()
 
-router.use(asyncHandler(globalAuth))
-router.use(asyncHandler(allowAccountTypes('user')))
+enrollmentRouter.use(asyncHandler(globalAuth))
 
-router.get('/summary', asyncHandler(enrollmentController.getSummary))
-router.post('/submit', asyncHandler(enrollmentController.submitApplication))
+enrollmentRouter.get('/summary', asyncHandler(enrollmentController.getSummary))
+enrollmentRouter.post('/submit', asyncHandler(enrollmentController.submit))
 
-export default router
+export default enrollmentRouter
