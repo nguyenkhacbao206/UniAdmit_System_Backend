@@ -19,7 +19,8 @@ export const updateStatus = async (req, res) => {
     try {
         const { id } = req.params
         const { status, message } = req.body
-        const data = await ApplicationService.updateStatus(id, status, message)
+        const staffId = req.currentStaff?._id || req.currentAdmin?._id
+        const data = await ApplicationService.updateStatus(id, status, message, staffId)
         res.json({
             success: true,
             data,

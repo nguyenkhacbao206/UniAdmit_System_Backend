@@ -1,6 +1,5 @@
 import Invoice from '@/models/invoice.js'
 import Preference from '@/models/preference.js'
-import User from '@/models/user.js'
 
 class PaymentService {
     async getInvoiceDetail(userId) {
