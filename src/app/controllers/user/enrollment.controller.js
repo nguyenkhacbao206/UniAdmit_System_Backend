@@ -1,9 +1,9 @@
-import UserEnrollmentService from '@/app/services/user-enrollment.service.js'
+import EnrollmentService from '@/app/services/enrollment.service'
 
 export const getSummary = async (req, res) => {
     try {
         const userId = req.currentUser._id
-        const data = await UserEnrollmentService.getSummary(userId)
+        const data = await EnrollmentService.getSummary(userId)
         res.json({
             success: true,
             data
@@ -16,10 +16,10 @@ export const getSummary = async (req, res) => {
     }
 }
 
-export const submitApplication = async (req, res) => {
+export const submit = async (req, res) => {
     try {
         const userId = req.currentUser._id
-        await UserEnrollmentService.submitApplication(userId)
+        await EnrollmentService.submit(userId)
         res.json({
             success: true,
             message: 'Nộp hồ sơ thành công'
