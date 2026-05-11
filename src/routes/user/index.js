@@ -9,6 +9,7 @@ import surveyRouter from './survey.router'
 import paymentRouter from './payment.router'
 import enrollmentRouter from './enrollment.router'
 import notificationRouter from './notification.router'
+import supplementRouter from './supplement.router'
 
 const user = Router()
 

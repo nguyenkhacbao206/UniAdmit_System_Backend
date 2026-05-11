@@ -4,6 +4,8 @@ import Score from '@/models/score.js'
 import Profile from '@/models/profile.js'
 import AdmissionMethod from '@/models/admission-method.js'
 import NotificationService from '@/app/services/notification.service.js'
+import SupplementService from '@/app/services/staff/supplement.service.js'
+import { Supplement } from '@/models/index.js'
 
 class ApplicationService {
     async getList(query = {}) {
@@ -66,14 +68,16 @@ class ApplicationService {
                 bestPoints = score?.average || 0
             }
 
-            preferences.forEach(pref => {
+            for (const pref of preferences) {
                 const finalPoints = pref.points || bestPoints
                 const finalComb = pref.combination || bestCombName
+                const supplements = await Supplement.find({ preferenceId: pref._id }).sort({ createdAt: -1 })
 
                 allRows.push({
                     ...pref.toObject(),
                     points: finalPoints,
                     combination: finalComb,
+                    supplements,
                     student: { 
                         ...user.toObject(),
                         profile: profile?.toObject(),
@@ -81,7 +85,7 @@ class ApplicationService {
                     },
                     submittedAt: pref.submittedAt || pref.createdAt
                 })
-            })
+            }
         }
 
         const total = allRows.length
@@ -97,7 +101,7 @@ class ApplicationService {
         }
     }
 
-    async updateStatus(id, status, message) {
+    async updateStatus(id, status, message, staffId) {
         const preference = await Preference.findByIdAndUpdate(id, { status }, { new: true })
             .populate('university major')
 
@@ -108,14 +112,19 @@ class ApplicationService {
         const majorName = preference.major?.name || 'Ngành đã đăng ký'
         const uniName = preference.university?.name || 'Trường đã đăng ký'
 
+        // Nếu trạng thái là yêu cầu bổ sung, tạo bản ghi Supplement
+        if (status === 'additional_required') {
+            await SupplementService.createRequest({
+                userId,
+                preferenceId: preference._id,
+                type: 'Bổ sung thông tin hồ sơ',
+                content: message || 'Vui lòng bổ sung thông tin theo yêu cầu của nhà trường.',
+                deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // Mặc định hạn 7 ngày
+            }, staffId)
+            return preference
+        }
+
         const notifMap = {
-            additional_required: {
-                title: '📋 Yêu cầu bổ sung thông tin hồ sơ',
-                description: message
-                    ? `Hồ sơ ngành ${majorName} - ${uniName} cần bổ sung: ${message}`
-                    : `Hồ sơ ngành ${majorName} - ${uniName} cần bổ sung thông tin. Vui lòng kiểm tra và cập nhật.`,
-                type: 'additional_required'
-            },
             approved: {
                 title: '✅ Hồ sơ đã được duyệt',
                 description: `Chúc mừng! Hồ sơ ngành ${majorName} - ${uniName} của bạn đã được duyệt thành công.`,
