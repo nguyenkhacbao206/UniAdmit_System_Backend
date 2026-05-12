@@ -8,6 +8,8 @@ import enrollmentRouter from './enrollment.router'
 import admissionMethodRouter from './admission'
 import surveyRouter from './survey.router'
 import paymentRouter from './payment.router'
+import roundRouter from './round.router'
+import admissionRouter from './admission.router'
 
 const admin = Router()
 
@@ -20,5 +22,7 @@ admin.use('/enrollments', enrollmentRouter)
 admin.use('/admission-method', admissionMethodRouter)
 admin.use('/survey', surveyRouter)
 admin.use('/payment', paymentRouter)
+admin.use('/rounds', roundRouter)
+admin.use('/admission', admissionRouter)
 
 export default admin
