@@ -1,0 +1,15 @@
+node_modules
+build
+dist
+.env
+.env.*
+!.env.example
+private/logs
+private/cache
+private/backups
+public/uploads
+.git
+.gitignore
+.eslintrc
+.vscode
+*.md
