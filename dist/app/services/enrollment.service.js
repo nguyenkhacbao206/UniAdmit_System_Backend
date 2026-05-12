@@ -11,6 +11,8 @@ var _preference = _interopRequireDefault(require("../../models/preference.js"));
 var _invoice = _interopRequireDefault(require("../../models/invoice.js"));
 var _score = _interopRequireDefault(require("../../models/score.js"));
 var _enrollment = _interopRequireDefault(require("../../models/enrollment.js"));
+var _application = _interopRequireDefault(require("../../models/application.js"));
+var _round = _interopRequireDefault(require("../../models/round.js"));
 class EnrollmentService {
   async createEnrollmentService(data) {
     return await _enrollment.default.create(data);
@@ -57,24 +59,32 @@ class EnrollmentService {
   async deleteEnrollment(id) {
     return await _enrollment.default.findByIdAndDelete(id);
   }
-  async getSummary(userId) {
+  async getSummary(userId, roundId) {
     const user = await _user.default.findById(userId);
     const profile = await _profile.default.findOne({
       user_id: userId
     });
-    const preferences = await _preference.default.find({
-      userId
-    }).populate('university major admissionMethod').sort({
-      priority: 1
-    });
     const score = await _score.default.findOne({
       user_id: userId
     });
-    const invoice = await _invoice.default.findOne({
-      userId
-    }).sort({
-      createdAt: -1
-    });
+    let round = null;
+    let applications = [];
+    let invoice = null;
+    if (roundId) {
+      round = await _round.default.findById(roundId);
+      applications = await _application.default.find({
+        user_id: userId,
+        round_id: roundId
+      }).populate('university_id major_id').sort({
+        aspiration_order: 1
+      });
+      invoice = await _invoice.default.findOne({
+        userId,
+        round_id: roundId
+      }).sort({
+        createdAt: -1
+      });
+    }
     let bestCombination = null;
     if (score && score.combinations) {
       const COMBINATIONS_CONFIG = {
@@ -122,70 +132,44 @@ class EnrollmentService {
     return {
       user,
       profile,
-      preferences,
+      applications,
+      round,
       score,
       invoice,
       bestCombination
     };
   }
-  async submit(userId) {
-    const user = await _user.default.findById(userId);
-    if (user.isSubmitted) {
-      throw new Error('Hồ sơ đã được nộp trước đó');
-    }
+  async submit(userId, roundId) {
+    if (!roundId) throw new Error('Vui lòng chọn đợt xét tuyển');
+    const round = await _round.default.findById(roundId);
+    if (!round) throw new Error('Không tìm thấy đợt xét tuyển');
     const profile = await _profile.default.findOne({
       user_id: userId
     });
     if (!profile || !profile.cccd) {
       throw new Error('Vui lòng hoàn thiện hồ sơ cá nhân');
     }
-    if (!user.isConfirmed) {
-      throw new Error('Vui lòng xác nhận danh sách nguyện vọng');
+    const applications = await _application.default.find({
+      user_id: userId,
+      round_id: roundId
+    });
+    if (applications.length === 0) {
+      throw new Error('Chưa có nguyện vọng nào trong đợt này');
     }
     const invoice = await _invoice.default.findOne({
       userId,
+      round_id: roundId,
       status: 'paid'
     });
     if (!invoice) {
-      throw new Error('Vui lòng thanh toán lệ phí tuyển sinh');
+      throw new Error('Vui lòng thanh toán lệ phí cho đợt này');
     }
-    const preferences = await _preference.default.find({
-      userId
-    });
-    if (preferences.length === 0) {
-      throw new Error('Chưa có nguyện vọng nào để nộp');
+    if (invoice.isSubmitted) {
+      throw new Error('Hồ sơ đợt này đã được nộp trước đó');
     }
-    const now = new Date();
-    const score = await _score.default.findOne({
-      user_id: userId
-    });
-    let bestPoints = score?.average || 0;
-    let bestCombName = '';
-    if (score && score.combinations) {
-      Object.entries(score.combinations).forEach(([comb, pts]) => {
-        if (pts > bestPoints) {
-          bestPoints = pts;
-          bestCombName = comb;
-        }
-      });
-    }
-    for (const pref of preferences) {
-      if (!pref.applicationCode) {
-        const count = await _preference.default.countDocuments({
-          applicationCode: {
-            $exists: true
-          }
-        });
-        pref.applicationCode = `APP${(count + 1).toString().padStart(3, '0')}`;
-      }
-      pref.status = 'pending';
-      pref.submittedAt = now;
-      pref.points = bestPoints;
-      pref.combination = bestCombName;
-      await pref.save();
-    }
-    user.isSubmitted = true;
-    await user.save();
+    invoice.isSubmitted = true;
+    invoice.submittedAt = new Date();
+    await invoice.save();
     return true;
   }
 }

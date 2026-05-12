@@ -3,7 +3,8 @@ import EnrollmentService from '@/app/services/enrollment.service'
 export const getSummary = async (req, res) => {
     try {
         const userId = req.currentUser._id
-        const data = await EnrollmentService.getSummary(userId)
+        const { round_id } = req.query
+        const data = await EnrollmentService.getSummary(userId, round_id)
         res.json({
             success: true,
             data
@@ -19,7 +20,8 @@ export const getSummary = async (req, res) => {
 export const submit = async (req, res) => {
     try {
         const userId = req.currentUser._id
-        await EnrollmentService.submit(userId)
+        const { round_id } = req.body
+        await EnrollmentService.submit(userId, round_id)
         res.json({
             success: true,
             message: 'Nộp hồ sơ thành công'

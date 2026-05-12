@@ -51,6 +51,14 @@ const invoiceSchema = (0, _base.default)('Invoice', 'invoices', {
   transactionId: {
     type: String,
     default: ''
+  },
+  isSubmitted: {
+    type: Boolean,
+    default: false
+  },
+  submittedAt: {
+    type: Date,
+    default: null
   }
 }, {
   timestamps: true

@@ -48,6 +48,14 @@ const invoiceSchema = createModel(
         transactionId: {
             type: String,
             default: ''
+        },
+        isSubmitted: {
+            type: Boolean,
+            default: false
+        },
+        submittedAt: {
+            type: Date,
+            default: null
         }
     },
     {
