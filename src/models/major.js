@@ -1,5 +1,5 @@
 
-import createModel, { ObjectId, STATUS_ACCOUNT } from './base'
+import createModel, { ObjectId } from './base'
 
 const Major = createModel(
     'Major',

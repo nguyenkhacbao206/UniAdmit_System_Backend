@@ -3,8 +3,9 @@ import PaymentService from '@/app/services/payment.service.js'
 export const getInvoice = async (req, res) => {
     try {
         const userId = req.currentUser._id
+        const { round_id } = req.query
 
-        const data = await PaymentService.getInvoiceDetail(userId)
+        const data = await PaymentService.getInvoiceDetail(userId, round_id)
 
         res.json({
             success: true,
@@ -21,9 +22,9 @@ export const getInvoice = async (req, res) => {
 export const confirmPayment = async (req, res) => {
     try {
         const userId = req.currentUser._id
-        const { paymentMethod } = req.body
+        const { paymentMethod, round_id } = req.body
 
-        const data = await PaymentService.confirmPayment(userId, paymentMethod)
+        const data = await PaymentService.confirmPayment(userId, paymentMethod, round_id)
 
         res.json({
             success: true,
@@ -41,8 +42,9 @@ export const confirmPayment = async (req, res) => {
 export const getStatus = async (req, res) => {
     try {
         const userId = req.currentUser._id
+        const { round_id } = req.query
 
-        const data = await PaymentService.getPaymentStatus(userId)
+        const data = await PaymentService.getPaymentStatus(userId, round_id)
 
         res.json({
             success: true,

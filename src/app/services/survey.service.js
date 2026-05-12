@@ -1,7 +1,6 @@
 import SurveyQuestion from '@/models/surveyQuestion'
 import SurveyOption from '@/models/surveyOption'
 import UserSurveyResult from '@/models/userSurveyResult'
-import Major from '@/models/major'
 
 class SurveyService {
 

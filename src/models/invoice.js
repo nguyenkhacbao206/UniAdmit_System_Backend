@@ -10,6 +10,11 @@ const invoiceSchema = createModel(
             ref: 'User',
             required: true
         },
+        round_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Round',
+            default: null
+        },
         admissionFee: {
             type: Number,
             required: true,

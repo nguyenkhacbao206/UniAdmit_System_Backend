@@ -15,7 +15,6 @@ var _survey = _interopRequireDefault(require("./survey.router"));
 var _payment = _interopRequireDefault(require("./payment.router"));
 var _enrollment = _interopRequireDefault(require("./enrollment.router"));
 var _notification = _interopRequireDefault(require("./notification.router"));
-var _supplement = _interopRequireDefault(require("./supplement.router"));
 var _application = _interopRequireDefault(require("./application.router"));
 const user = (0, _express.Router)();
 user.use('/auth', _auth.default);
