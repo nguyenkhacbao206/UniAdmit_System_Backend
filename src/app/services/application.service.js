@@ -13,8 +13,8 @@ class ApplicationService {
         if (!round) throw new Error('Không tìm thấy đợt tuyển sinh')
         if (round.status !== 'open') throw new Error('Đợt tuyển sinh đã đóng, không thể đăng ký')
 
-        const paidInvoice = await Invoice.findOne({ userId, round_id, status: 'paid' })
-        if (paidInvoice) throw new Error('Đợt này đã thanh toán, không thể thêm nguyện vọng')
+        const submittedInvoice = await Invoice.findOne({ userId, round_id, isSubmitted: true })
+        if (submittedInvoice) throw new Error('Đợt này đã nộp hồ sơ, không thể thêm nguyện vọng')
 
         const exists = await Application.findOne({ user_id: userId, round_id, major_id })
         if (exists) throw new Error('Bạn đã đăng ký ngành này trong đợt tuyển sinh này')
@@ -131,8 +131,8 @@ class ApplicationService {
             throw new Error('Đợt tuyển sinh đã đóng, không thể hủy đăng ký')
         }
 
-        const paidInvoice = await Invoice.findOne({ userId, round_id: application.round_id, status: 'paid' })
-        if (paidInvoice) throw new Error('Đợt này đã thanh toán, không thể hủy nguyện vọng')
+        const submittedInvoice = await Invoice.findOne({ userId, round_id: application.round_id, isSubmitted: true })
+        if (submittedInvoice) throw new Error('Đợt này đã nộp hồ sơ, không thể hủy nguyện vọng')
 
         if (application.status !== 'pending') {
             throw new Error('Hồ sơ đã được xử lý, không thể hủy')
