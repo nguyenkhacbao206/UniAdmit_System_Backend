@@ -1,5 +1,6 @@
 import Invoice from '@/models/invoice.js'
 import Preference from '@/models/preference.js'
+import Application from '@/models/application.js'
 
 class PaymentService {
     async getInvoiceDetail(userId) {
@@ -9,11 +10,13 @@ class PaymentService {
             return paidInvoice
         }
 
-        // Count number of preferences
-        const preferences = await Preference.find({ userId })
-        const preferenceCount = preferences.length
+        // Count applications first, fall back to preferences
+        const applicationCount = await Application.countDocuments({ user_id: userId })
+        const preferenceCount = applicationCount > 0
+            ? applicationCount
+            : (await Preference.find({ userId })).length
 
-        // If no preferences, nothing to pay
+        // If nothing registered, nothing to pay
         if (preferenceCount === 0) {
             throw new Error('Bạn chưa đăng ký nguyện vọng nào.')
         }

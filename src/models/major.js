@@ -36,6 +36,11 @@ const Major = createModel(
             required: true
         },
 
+        minimum_score: {
+            type: Number,
+            default: 0
+        },
+
         description: {
             type: String,
             default: ''
@@ -77,7 +82,7 @@ const Major = createModel(
             default: '0%'
         },
 
-        // --- Suggestion Module Fields ---
+        // Suggestion Module Fields
         suitability_reason: {
             type: String,
             default: ''

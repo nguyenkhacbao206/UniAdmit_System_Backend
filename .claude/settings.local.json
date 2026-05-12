@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Recurse -Directory)",
+      "Bash(Select-Object -First 50)",
+      "Bash(Format-Table FullName)",
+      "Bash(npm run *)",
+      "Bash(Get-ChildItem -Path \"d:\\\\UniAdmit-System-Frontend\" -Force)",
+      "Bash(Select-Object Name, PSIsContainer)",
+      "Bash(cd /d/UniAdmit-System-Frontend && ls -la)",
+      "Read(//d/d/**)",
+      "Bash(xargs ls -lt)",
+      "Bash(npx babel *)",
+      "Bash(npx tsc *)"
+    ]
+  }
+}
