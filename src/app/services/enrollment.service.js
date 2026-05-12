@@ -125,7 +125,11 @@ class EnrollmentService {
             round,
             score,
             invoice,
-            bestCombination
+            bestCombination,
+            feeConfig: round ? {
+                feePerPreference: round.feePerPreference || 20000,
+                serviceFee: round.serviceFee || 20000
+            } : null
         }
     }
 
@@ -150,11 +154,9 @@ class EnrollmentService {
             throw new Error('Hồ sơ đợt này đã được nộp trước đó')
         }
 
-        const FEE_PER_PREFERENCE = 20000
-        const SERVICE_FEE = 20000
         const preferenceCount = applications.length
-        const admissionFee = preferenceCount * FEE_PER_PREFERENCE
-        const serviceFee = SERVICE_FEE
+        const admissionFee = preferenceCount * (round.feePerPreference || 20000)
+        const serviceFee = round.serviceFee || 20000
         const totalAmount = admissionFee + serviceFee
 
         let invoice = await Invoice.findOne({ userId, round_id: roundId })

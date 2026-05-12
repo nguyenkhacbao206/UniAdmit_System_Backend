@@ -39,6 +39,16 @@ const Round = createModel(
         endDate: {
             type: Date,
             required: true
+        },
+
+        feePerPreference: {
+            type: Number,
+            default: 20000
+        },
+
+        serviceFee: {
+            type: Number,
+            default: 20000
         }
     },
     {
