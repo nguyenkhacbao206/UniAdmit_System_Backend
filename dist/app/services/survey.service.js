@@ -8,7 +8,6 @@ exports.default = void 0;
 var _surveyQuestion = _interopRequireDefault(require("../../models/surveyQuestion"));
 var _surveyOption = _interopRequireDefault(require("../../models/surveyOption"));
 var _userSurveyResult = _interopRequireDefault(require("../../models/userSurveyResult"));
-var _major = _interopRequireDefault(require("../../models/major"));
 class SurveyService {
   async createQuestion(data, staffId) {
     return await _surveyQuestion.default.create({

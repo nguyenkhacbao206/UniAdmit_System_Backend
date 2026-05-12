@@ -10,7 +10,7 @@ var _round = _interopRequireDefault(require("../../models/round.js"));
 var _major = _interopRequireDefault(require("../../models/major.js"));
 var _score = _interopRequireDefault(require("../../models/score.js"));
 var _admissionResult = _interopRequireDefault(require("../../models/admission-result.js"));
-var _notificationService = _interopRequireDefault(require("./notification.service.js"));
+var _invoice = _interopRequireDefault(require("../../models/invoice.js"));
 class ApplicationService {
   async create(userId, data) {
     const {
@@ -24,6 +24,12 @@ class ApplicationService {
     const round = await _round.default.findById(round_id);
     if (!round) throw new Error('Không tìm thấy đợt tuyển sinh');
     if (round.status !== 'open') throw new Error('Đợt tuyển sinh đã đóng, không thể đăng ký');
+    const paidInvoice = await _invoice.default.findOne({
+      userId,
+      round_id,
+      status: 'paid'
+    });
+    if (paidInvoice) throw new Error('Đợt này đã thanh toán, không thể thêm nguyện vọng');
     const exists = await _application.default.findOne({
       user_id: userId,
       round_id,
@@ -134,6 +140,12 @@ class ApplicationService {
     if (!round || round.status !== 'open') {
       throw new Error('Đợt tuyển sinh đã đóng, không thể hủy đăng ký');
     }
+    const paidInvoice = await _invoice.default.findOne({
+      userId,
+      round_id: application.round_id,
+      status: 'paid'
+    });
+    if (paidInvoice) throw new Error('Đợt này đã thanh toán, không thể hủy nguyện vọng');
     if (application.status !== 'pending') {
       throw new Error('Hồ sơ đã được xử lý, không thể hủy');
     }

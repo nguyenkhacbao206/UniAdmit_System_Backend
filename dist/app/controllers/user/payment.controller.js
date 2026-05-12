@@ -9,7 +9,10 @@ var _paymentService = _interopRequireDefault(require("../../services/payment.ser
 const getInvoice = async (req, res) => {
   try {
     const userId = req.currentUser._id;
-    const data = await _paymentService.default.getInvoiceDetail(userId);
+    const {
+      round_id
+    } = req.query;
+    const data = await _paymentService.default.getInvoiceDetail(userId, round_id);
     res.json({
       success: true,
       data
@@ -26,9 +29,10 @@ const confirmPayment = async (req, res) => {
   try {
     const userId = req.currentUser._id;
     const {
-      paymentMethod
+      paymentMethod,
+      round_id
     } = req.body;
-    const data = await _paymentService.default.confirmPayment(userId, paymentMethod);
+    const data = await _paymentService.default.confirmPayment(userId, paymentMethod, round_id);
     res.json({
       success: true,
       message: 'Thanh toán thành công',
@@ -45,7 +49,10 @@ exports.confirmPayment = confirmPayment;
 const getStatus = async (req, res) => {
   try {
     const userId = req.currentUser._id;
-    const data = await _paymentService.default.getPaymentStatus(userId);
+    const {
+      round_id
+    } = req.query;
+    const data = await _paymentService.default.getPaymentStatus(userId, round_id);
     res.json({
       success: true,
       data

@@ -3,7 +3,7 @@ import Round from '@/models/round.js'
 import Major from '@/models/major.js'
 import Score from '@/models/score.js'
 import AdmissionResult from '@/models/admission-result.js'
-import NotificationService from '@/app/services/notification.service.js'
+import Invoice from '@/models/invoice.js'
 
 class ApplicationService {
     async create(userId, data) {
@@ -12,6 +12,9 @@ class ApplicationService {
         const round = await Round.findById(round_id)
         if (!round) throw new Error('Không tìm thấy đợt tuyển sinh')
         if (round.status !== 'open') throw new Error('Đợt tuyển sinh đã đóng, không thể đăng ký')
+
+        const paidInvoice = await Invoice.findOne({ userId, round_id, status: 'paid' })
+        if (paidInvoice) throw new Error('Đợt này đã thanh toán, không thể thêm nguyện vọng')
 
         const exists = await Application.findOne({ user_id: userId, round_id, major_id })
         if (exists) throw new Error('Bạn đã đăng ký ngành này trong đợt tuyển sinh này')
@@ -127,6 +130,9 @@ class ApplicationService {
         if (!round || round.status !== 'open') {
             throw new Error('Đợt tuyển sinh đã đóng, không thể hủy đăng ký')
         }
+
+        const paidInvoice = await Invoice.findOne({ userId, round_id: application.round_id, status: 'paid' })
+        if (paidInvoice) throw new Error('Đợt này đã thanh toán, không thể hủy nguyện vọng')
 
         if (application.status !== 'pending') {
             throw new Error('Hồ sơ đã được xử lý, không thể hủy')

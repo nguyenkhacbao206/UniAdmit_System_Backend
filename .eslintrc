@@ -20,7 +20,7 @@
       }
     }
   },
-  "ignorePatterns": ["node_modules", "build", "public", "private"],
+  "ignorePatterns": ["node_modules", "build", "dist", "public", "private"],
   "rules": {
     "indent": ["error", 4, {"SwitchCase": 1}],
     "semi": ["error", "never"],

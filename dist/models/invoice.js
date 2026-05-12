@@ -13,6 +13,11 @@ const invoiceSchema = (0, _base.default)('Invoice', 'invoices', {
     ref: 'User',
     required: true
   },
+  round_id: {
+    type: _mongoose.default.Schema.Types.ObjectId,
+    ref: 'Round',
+    default: null
+  },
   admissionFee: {
     type: Number,
     required: true,

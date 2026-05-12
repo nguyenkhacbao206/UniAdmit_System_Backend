@@ -1,4 +1,3 @@
-import express from 'express'
 import admin from './admin'
 import user from './user'
 import auth from './auth.router'
