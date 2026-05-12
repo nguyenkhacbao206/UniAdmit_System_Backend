@@ -63,7 +63,9 @@ class SupplementService {
 
         if (action === 'approve') {
             supplement.status = 'approved'
-            // Có thể cập nhật lại Preference status nếu cần
+            if (supplement.preferenceId) {
+                await Preference.findByIdAndUpdate(supplement.preferenceId, { status: 'approved' })
+            }
         } else if (action === 'reject') {
             supplement.status = 'rejected'
         }

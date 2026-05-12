@@ -145,18 +145,40 @@ class EnrollmentService {
             throw new Error('Chưa có nguyện vọng nào trong đợt này')
         }
 
-        const invoice = await Invoice.findOne({ userId, round_id: roundId, status: 'paid' })
-        if (!invoice) {
-            throw new Error('Vui lòng thanh toán lệ phí cho đợt này')
-        }
-
-        if (invoice.isSubmitted) {
+        const existingSubmitted = await Invoice.findOne({ userId, round_id: roundId, isSubmitted: true })
+        if (existingSubmitted) {
             throw new Error('Hồ sơ đợt này đã được nộp trước đó')
         }
 
-        invoice.isSubmitted = true
-        invoice.submittedAt = new Date()
-        await invoice.save()
+        const FEE_PER_PREFERENCE = 20000
+        const SERVICE_FEE = 20000
+        const preferenceCount = applications.length
+        const admissionFee = preferenceCount * FEE_PER_PREFERENCE
+        const serviceFee = SERVICE_FEE
+        const totalAmount = admissionFee + serviceFee
+
+        let invoice = await Invoice.findOne({ userId, round_id: roundId })
+        if (invoice) {
+            invoice.preferenceCount = preferenceCount
+            invoice.admissionFee = admissionFee
+            invoice.serviceFee = serviceFee
+            invoice.totalAmount = totalAmount
+            invoice.isSubmitted = true
+            invoice.submittedAt = new Date()
+            await invoice.save()
+        } else {
+            invoice = await Invoice.create({
+                userId,
+                round_id: roundId,
+                preferenceCount,
+                admissionFee,
+                serviceFee,
+                totalAmount,
+                status: 'pending',
+                isSubmitted: true,
+                submittedAt: new Date()
+            })
+        }
 
         return true
     }

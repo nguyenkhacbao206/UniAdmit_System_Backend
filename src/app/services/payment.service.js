@@ -1,77 +1,29 @@
 import Invoice from '@/models/invoice.js'
-import Preference from '@/models/preference.js'
-import Application from '@/models/application.js'
 
 class PaymentService {
     async getInvoiceDetail(userId, roundId) {
-        const query = { userId }
-        if (roundId) query.round_id = roundId
+        if (!roundId) throw new Error('Vui lòng chọn đợt xét tuyển')
 
-        const paidInvoice = await Invoice.findOne({ ...query, status: 'paid' }).populate('round_id', 'name code year')
-        if (paidInvoice) {
-            return paidInvoice
+        const invoice = await Invoice.findOne({ userId, round_id: roundId, isSubmitted: true })
+            .populate('round_id', 'name code year')
+
+        if (!invoice) {
+            throw new Error('Vui lòng nộp hồ sơ trước khi thanh toán')
         }
 
-        let preferenceCount = 0
-        if (roundId) {
-            preferenceCount = await Application.countDocuments({ user_id: userId, round_id: roundId })
-        } else {
-            const applicationCount = await Application.countDocuments({ user_id: userId })
-            preferenceCount = applicationCount > 0
-                ? applicationCount
-                : (await Preference.find({ userId })).length
-        }
-
-        if (preferenceCount === 0) {
-            throw new Error('Bạn chưa đăng ký nguyện vọng nào trong đợt này.')
-        }
-
-        const FEE_PER_PREFERENCE = 20000
-        const SERVICE_FEE = 20000
-
-        const admissionFee = preferenceCount * FEE_PER_PREFERENCE
-        const serviceFee = SERVICE_FEE
-        const totalAmount = admissionFee + serviceFee
-
-        let invoice = await Invoice.findOne({ ...query, status: 'pending' })
-
-        if (invoice) {
-            if (invoice.preferenceCount !== preferenceCount) {
-                invoice.preferenceCount = preferenceCount
-                invoice.admissionFee = admissionFee
-                invoice.serviceFee = serviceFee
-                invoice.totalAmount = totalAmount
-                await invoice.save()
-            }
-        } else {
-            invoice = await Invoice.create({
-                userId,
-                round_id: roundId || null,
-                preferenceCount,
-                admissionFee,
-                serviceFee,
-                totalAmount,
-                status: 'pending'
-            })
-        }
-
-        return invoice.populate('round_id', 'name code year')
+        return invoice
     }
 
     async confirmPayment(userId, paymentMethod, roundId) {
-        const query = { userId, status: 'pending' }
-        if (roundId) query.round_id = roundId
+        if (!roundId) throw new Error('Vui lòng chọn đợt xét tuyển')
 
-        const invoice = await Invoice.findOne(query)
+        const invoice = await Invoice.findOne({ userId, round_id: roundId, isSubmitted: true })
 
         if (!invoice) {
-            const paidQuery = { userId, status: 'paid' }
-            if (roundId) paidQuery.round_id = roundId
-            const paidInvoice = await Invoice.findOne(paidQuery)
-            if (paidInvoice) return paidInvoice
-
-            throw new Error('Không tìm thấy hóa đơn chưa thanh toán.')
+            throw new Error('Vui lòng nộp hồ sơ trước khi thanh toán')
         }
+
+        if (invoice.status === 'paid') return invoice
 
         invoice.status = 'paid'
         invoice.paymentMethod = paymentMethod || 'vnpay'

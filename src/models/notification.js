@@ -21,7 +21,7 @@ const notificationSchema = createModel(
         },
         type: {
             type: String,
-            enum: ['additional_required', 'approved', 'rejected', 'system'],
+            enum: ['additional_required', 'approved', 'rejected', 'submitted', 'system'],
             default: 'system'
         },
         read: {
