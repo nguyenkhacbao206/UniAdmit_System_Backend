@@ -9,7 +9,10 @@ var _enrollment = _interopRequireDefault(require("../../services/enrollment.serv
 const getSummary = async (req, res) => {
   try {
     const userId = req.currentUser._id;
-    const data = await _enrollment.default.getSummary(userId);
+    const {
+      round_id
+    } = req.query;
+    const data = await _enrollment.default.getSummary(userId, round_id);
     res.json({
       success: true,
       data
@@ -25,7 +28,10 @@ exports.getSummary = getSummary;
 const submit = async (req, res) => {
   try {
     const userId = req.currentUser._id;
-    await _enrollment.default.submit(userId);
+    const {
+      round_id
+    } = req.body;
+    await _enrollment.default.submit(userId, round_id);
     res.json({
       success: true,
       message: 'Nộp hồ sơ thành công'
