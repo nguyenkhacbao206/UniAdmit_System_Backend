@@ -83,6 +83,16 @@ const Profile = createModel(
         rank: {
             type: String,
             default: '',
+        },
+
+        cccd_doc: {
+            type: String,
+            default: '',
+        },
+
+        transcript_doc: {
+            type: String,
+            default: '',
         }
     }
 )

@@ -164,6 +164,19 @@ const swaggerOptions = {
                             items: { $ref: '#/components/schemas/AcademicScoreSemester' }
                         }
                     }
+                },
+                University: {
+                    type: 'object',
+                    properties: {
+                        _id: { type: 'string' },
+                        code: { type: 'string', example: 'BKA' },
+                        name: { type: 'string', example: 'Đại học Bách Khoa Hà Nội' },
+                        location: { type: 'string', example: 'Hà Nội' },
+                        majors: { type: 'integer', example: 50 },
+                        status: { type: 'string', enum: ['active', 'inactive'], default: 'active' },
+                        createdAt: { type: 'string', format: 'date-time' },
+                        updatedAt: { type: 'string', format: 'date-time' },
+                    }
                 }
             }
         },

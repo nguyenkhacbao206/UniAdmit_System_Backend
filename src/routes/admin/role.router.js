@@ -1,7 +1,8 @@
 import * as roleMiddleware from '@/app/middleware/admin/role.middleware'
 import * as roleRequest from '@/app/requests/admin/role.request'
 import * as roleController from '@/app/controllers/admin/role.controller'
-import * as authMiddleware from '@/app/middleware/admin/auth.middleware'
+import { allowAccountTypes, requireAdminRoles } from '@/app/middleware/permission'
+import { globalAuth } from '@/app/middleware/globalAuth.middleware'
 import {asyncHandler} from '@/utils/helpers'
 import {Router} from 'express'
 import validate from '@/app/middleware/admin/validate'
@@ -15,7 +16,7 @@ const roleRouter = Router()
  *   description: Role management for admins
  */
 
-roleRouter.use(asyncHandler(authMiddleware.checkValidToken))
+roleRouter.use(asyncHandler(globalAuth))
 
 /**
  * @swagger
@@ -81,6 +82,8 @@ roleRouter.get(
  */
 roleRouter.post(
     '/',
+    asyncHandler(allowAccountTypes('admin')),
+    asyncHandler(requireAdminRoles('super-admin')),
     asyncHandler(validate(roleRequest.createItem)),
     asyncHandler(roleController.createItem)
 )
@@ -118,6 +121,8 @@ roleRouter.post(
  */
 roleRouter.put(
     '/:roleId',
+    asyncHandler(allowAccountTypes('admin')),
+    asyncHandler(requireAdminRoles('super-admin')),
     asyncHandler(roleMiddleware.checkRoleId),
     roleMiddleware.canUpdate,
     asyncHandler(validate(roleRequest.updateItem)),
@@ -144,6 +149,8 @@ roleRouter.put(
  */
 roleRouter.delete(
     '/:roleId',
+    asyncHandler(allowAccountTypes('admin')),
+    asyncHandler(requireAdminRoles('super-admin')),
     asyncHandler(roleMiddleware.checkRoleId),
     roleMiddleware.canDelete,
     asyncHandler(roleController.deleteItem)
@@ -198,6 +205,8 @@ roleRouter.get(
  */
 roleRouter.patch(
     '/:roleId/update-permission-for-role/:permissionId',
+    asyncHandler(allowAccountTypes('admin')),
+    asyncHandler(requireAdminRoles('super-admin')),
     asyncHandler(roleMiddleware.checkRoleId),
     roleMiddleware.canUpdate,
     asyncHandler(roleMiddleware.checkPermissionId),
@@ -287,6 +296,8 @@ roleRouter.get(
  */
 roleRouter.patch(
     '/:roleId/add-accounts',
+    asyncHandler(allowAccountTypes('admin')),
+    asyncHandler(requireAdminRoles('super-admin')),
     asyncHandler(roleMiddleware.checkRoleId),
     roleMiddleware.canUpdate,
     asyncHandler(validate(roleRequest.addAccountsForRole)),
@@ -318,6 +329,8 @@ roleRouter.patch(
  */
 roleRouter.delete(
     '/:roleId/delete-account-in-role/:accountId',
+    asyncHandler(allowAccountTypes('admin')),
+    asyncHandler(requireAdminRoles('super-admin')),
     asyncHandler(roleMiddleware.checkRoleId),
     roleMiddleware.canUpdate,
     asyncHandler(roleMiddleware.checkAccountId),

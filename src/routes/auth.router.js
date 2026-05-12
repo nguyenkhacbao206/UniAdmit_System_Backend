@@ -1,6 +1,10 @@
-import {Router} from 'express'
-import {asyncHandler} from '@/utils/helpers'
+import { Router } from 'express'
+import { asyncHandler } from '@/utils/helpers'
+import validate from '@/app/middleware/admin/validate'
 import * as authController from '@/app/controllers/user/auth.controller'
+import * as globalAuthController from '@/app/controllers/auth.controller'
+import * as authRequest from '@/app/requests/auth.request'
+import { checkUniversalToken } from '@/app/middleware/auth'
 
 const authRouter = Router()
 
@@ -42,5 +46,45 @@ authRouter.get(
     '/google/callback',
     asyncHandler(authController.googleCallback)
 )
+
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Universal Login for Users, Admins, and Staff. Identifier is email or phone.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - identifier
+ *               - password
+ *             properties:
+ *               identifier:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful. Returns roles dynamically.
+ */
+authRouter.post('/login', asyncHandler(validate(authRequest.loginUniversal)), asyncHandler(globalAuthController.loginUniversal))
+
+/**
+ * @swagger
+ * /auth/me:
+ *   get:
+ *     tags: [Auth]
+ *     summary: Universal Profile Data
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Trả về thông tin Admin hoặc User tương ứng với Token
+ */
+authRouter.get('/me', asyncHandler(checkUniversalToken), asyncHandler(globalAuthController.meUniversal))
 
 export default authRouter

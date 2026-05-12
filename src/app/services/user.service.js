@@ -10,7 +10,7 @@ export async function updateUserProfile(userId, profileData) {
 
     // Update thông tin cơ bản ở User (nếu có)
     const userFields = ['name', 'phone', 'email', 'avatar', 'gender', 'dob', 'address']
-    const userData = _.omitBy(_.pick(profileData, userFields), _.isNil)
+    const userData = _.omitBy(_.pick(profileData, userFields), (v) => _.isNil(v) || v === '')
     
     if (userData.email && userData.email !== user.email) {
         const existEmail = await User.findOne({ email: userData.email, _id: { $ne: userId }, deleted: false })
@@ -26,7 +26,7 @@ export async function updateUserProfile(userId, profileData) {
     await user.save()
 
     // Update thông tin chi tiết ở Profile
-    const profileFields = ['ethnicity', 'gender', 'dob', 'permanentAddress', 'contactAddress', 'cccd', 'place_of_issue', 'avatar', 'cv', 'school', 'score', 'rank']
+    const profileFields = ['ethnicity', 'gender', 'dob', 'permanentAddress', 'contactAddress', 'cccd', 'place_of_issue', 'avatar', 'cv', 'school', 'score', 'rank', 'cccd_doc', 'transcript_doc']
     const detailData = _.omitBy(_.pick(profileData, profileFields), _.isNil)
     
     let profile = await Profile.findOne({ user_id: userId })
@@ -81,8 +81,12 @@ export async function updateAvatar(userId, avatarPath) {
     user.avatar = avatarPath
     await user.save()
     
-    // Đồng bộ sang Profile
-    await Profile.findOneAndUpdate({ user_id: userId }, { avatar: avatarPath })
+    // Đồng bộ sang Profile (upsert để đảm bảo tạo mới nếu chưa có)
+    await Profile.findOneAndUpdate(
+        { user_id: userId }, 
+        { avatar: avatarPath },
+        { upsert: true, new: true }
+    )
     
     return user.avatar
 }
@@ -94,4 +98,13 @@ export async function updateCV(userId, cvPath) {
         { new: true, upsert: true }
     )
     return profile.cv
+}
+
+export async function updateDocument(userId, field, path) {
+    const profile = await Profile.findOneAndUpdate(
+        { user_id: userId },
+        { [field]: path },
+        { new: true, upsert: true }
+    )
+    return profile[field]
 }

@@ -2,12 +2,12 @@ import express from 'express'
 import * as profileController from '@/app/controllers/user/profile.controller'
 import validate from '@/app/middleware/user/validate'
 import * as profileRequest from '@/app/requests/user/profile.request'
-import { checkValidToken } from '@/app/middleware/user/auth.middleware'
+import { globalAuth } from '@/app/middleware/globalAuth.middleware'
 import { asyncHandler } from '@/utils/helpers'
 
 const router = express.Router()
 
-router.use(asyncHandler(checkValidToken))
+router.use(asyncHandler(globalAuth))
 
 /**
  * @swagger
@@ -180,5 +180,38 @@ router.patch('/avatar', asyncHandler(profileController.updateAvatar))
  *                 message: { type: string, example: "Tải lên CV thành công" }
  */
 router.post('/cv', asyncHandler(profileController.uploadCV))
+
+/**
+ * @swagger
+ * /user/profile/document/{field}:
+ *   post:
+ *     tags: [User Profile]
+ *     summary: Tải lên tài liệu minh chứng theo trường
+ *     description: Tải lên file minh chứng (CCCD hoặc Bảng điểm).
+ *     parameters:
+ *       - in: path
+ *         name: field
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [cccd_doc, transcript_doc]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required: [file]
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Tải lên thành công.
+ */
+router.post('/document/:field', asyncHandler(profileController.uploadDocument))
 
 export default router

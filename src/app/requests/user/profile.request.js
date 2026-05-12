@@ -27,6 +27,7 @@ export const updateProfile = Joi.object({
     phone: Joi.string()
         .pattern(VALIDATE_PHONE_REGEX)
         .label('Số điện thoại')
+        .allow('')
         .custom((value, helpers) => 
             new AsyncValidate(value, async function(req) {
                 if (!value) return value

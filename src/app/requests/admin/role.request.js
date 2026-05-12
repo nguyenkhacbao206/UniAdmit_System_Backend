@@ -34,34 +34,36 @@ export const createItem = Joi.object({
         }),
     description: Joi.string().trim().max(100).empty(Joi.valid('', null)).default('').label('Mô tả'),
 })
+
 function isNotValidParentId(tree, id, parentId) {
-    function findNodeById(node, id) {
-        if (node._id.equals(id)) return node
-        if (node.children) {
-            for (const child of node.children) {
-                const result = findNodeById(child, id)
+    function findNodeById(nodes, id) {
+        for (const node of nodes) {
+            if (node._id.equals(id)) return node
+            if (node.children) {
+                const result = findNodeById(node.children, id)
                 if (result) return result
             }
         }
         return null
     }
 
-    function checkDescendant(node, parentId) {
-        if (node._id.equals(parentId)) return true
+    function checkDescendant(node, targetId) {
+        if (node._id.equals(targetId)) return true
         if (node.children) {
             for (const child of node.children) {
-                if (checkDescendant(child, parentId)) return true
+                if (checkDescendant(child, targetId)) return true
             }
         }
         return false
     }
 
-    const startNode = findNodeById(tree[0], id)
+    const startNode = findNodeById(tree, id)
     if (startNode) {
         return checkDescendant(startNode, parentId)
     }
     return false
 }
+
 export const updateItem = Joi.object({
     name: Joi.string()
         .trim()
@@ -85,9 +87,10 @@ export const updateItem = Joi.object({
                 return helpers.error('any.invalid')
             }
             return new AsyncValidate(value, async function (req) {
-                const role = await Role.findOne({
-                    $and: [{_id: value}, {_id: {$ne: req.role._id}}],
-                })
+                if (req.role._id.equals(value)) {
+                    return helpers.error('any.invalid')
+                }
+                const role = await Role.findById(value)
                 if (role) {
                     const tree = await roleService.treeData()
                     if (!isNotValidParentId(tree, req.role._id, role._id)) {
@@ -99,6 +102,7 @@ export const updateItem = Joi.object({
         }),
     description: Joi.string().trim().max(100).empty(Joi.valid('', null)).default('').label('Mô tả'),
 })
+
 export const addAccountsForRole = Joi.object({
     account_ids: Joi.array()
         .single()
@@ -120,10 +124,11 @@ export const addAccountsForRole = Joi.object({
                     })
                 })
         )
-        .empty(Joi.valid('', null))
-        .default([])
+        .min(1)
+        .required()
         .label('Người dùng'),
 })
+
 export const readAccounts = Joi.object({
     q: tryValidateOrDefault(Joi.string().trim(), ''),
     page: tryValidateOrDefault(Joi.number().integer().min(1), 1),

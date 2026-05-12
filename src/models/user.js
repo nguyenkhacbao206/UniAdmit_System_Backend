@@ -52,6 +52,16 @@ const User = createModel(
             required: true,
             default: STATUS_ACCOUNT.UNVERIFIED,
         },
+
+        isConfirmed: {
+            type: Boolean,
+            default: false
+        },
+        isSubmitted: {
+            type: Boolean,
+            default: false
+        },
+
         otp: {
             type: String,
             default: '',
