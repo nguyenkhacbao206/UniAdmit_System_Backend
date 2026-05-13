@@ -68,15 +68,11 @@ export async function profileAdmin(currentAdmin) {
 }
 
 export async function checkValidLoginUser({ email, password }) {
-    // Tìm user theo email
     const user = await User.findOne({ email, deleted: false })
 
     if (user) {
         const verified = user.verifyPassword(password)
         if (verified) {
-            if (user.status === STATUS_ACCOUNT.UNVERIFIED) {
-                abort(400, 'Tài khoản chưa được xác thực. Vui lòng kiểm tra email.')
-            }
             if (user.status === STATUS_ACCOUNT.INACTIVE) {
                 abort(400, 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản lý.')
             }
@@ -130,10 +126,14 @@ export async function universalLogin({ identifier, username, password }) {
 
     if (user) {
         if (!user.verifyPassword(password)) abort(400, 'Tài khoản hoặc mật khẩu không đúng.')
-        if (user.status === STATUS_ACCOUNT.UNVERIFIED) abort(400, 'Tài khoản chưa được xác thực. Vui lòng kiểm tra email.')
         if (user.status === STATUS_ACCOUNT.INACTIVE) abort(400, 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản lý.')
 
         await updateOTP(user)
+
+        if (user.status === STATUS_ACCOUNT.UNVERIFIED) {
+            return { user, roles: ['user'], account_type: 'user', requires_otp: true, requires_verify: true }
+        }
+
         return { user, roles: ['user'], account_type: 'user', requires_otp: true }
     }
 

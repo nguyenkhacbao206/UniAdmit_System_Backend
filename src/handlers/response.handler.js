@@ -30,8 +30,11 @@ export function jsonify(data, message) {
 }
 
 export function sendMail(to, subject, template, data, mailOptions) {
-    ejs.renderFile(path.join(VIEW_DIR, template + '.ejs'), {...this.locals, ...data}, function (err, html) {
+    const templatePath = path.join(VIEW_DIR, template + '.ejs')
+    console.log('[MAIL DEBUG] sendMail called:', { to, subject, template, templatePath })
+    ejs.renderFile(templatePath, {...this.locals, ...data}, function (err, html) {
         if (err) {
+            console.error('[MAIL DEBUG] EJS render error:', err.message)
             const detail = normalizeError(err)
             logger.error({
                 message: 'Error rendering email template: ' + template,
@@ -39,6 +42,7 @@ export function sendMail(to, subject, template, data, mailOptions) {
             })
             return
         }
+        console.log('[MAIL DEBUG] EJS rendered OK, sending via mailTransporter...')
         mailTransporter.sendMail(
             {
                 ...mailOptions,
@@ -47,13 +51,17 @@ export function sendMail(to, subject, template, data, mailOptions) {
                 subject,
                 html,
             },
-            function (err) {
-                if (!err) return
-                const detail = normalizeError(err)
-                logger.error({
-                    message: 'Error sending email to ' + to,
-                    detail,
-                })
+            function (err, result) {
+                if (err) {
+                    console.error('[MAIL DEBUG] mailTransporter error:', err.message || err)
+                    const detail = normalizeError(err)
+                    logger.error({
+                        message: 'Error sending email to ' + to,
+                        detail,
+                    })
+                    return
+                }
+                console.log('[MAIL DEBUG] Email sent OK:', result)
             }
         )
     })
