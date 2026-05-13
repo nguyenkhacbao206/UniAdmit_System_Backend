@@ -75,19 +75,23 @@ export const DB_USERNAME = process.env.DB_USERNAME
 export const DB_PASSWORD = process.env.DB_PASSWORD
 export const DB_AUTH_SOURCE = process.env.DB_AUTH_SOURCE
 
-export const MAIL_HOST = process.env.MAIL_HOST
-export const MAIL_PORT = process.env.MAIL_PORT
-// Tự động xác định secure: 465 là true (SSL), còn lại (587) là false (STARTTLS)
-export const MAIL_SECURE = Number(MAIL_PORT) === 465
-export const MAIL_USERNAME = process.env.MAIL_USERNAME
-export const MAIL_PASSWORD = (process.env.MAIL_PASSWORD || '').replace(/\s+/g, '')
-export const MAIL_FROM_ADDRESS = process.env.MAIL_FROM_ADDRESS || MAIL_USERNAME
-export const MAIL_FROM_NAME = process.env.MAIL_FROM_NAME || APP_NAME
+// --- Nodemailer SMTP (cũ - bị Render free chặn port 465/587) ---
+// export const MAIL_HOST = process.env.MAIL_HOST
+// export const MAIL_PORT = process.env.MAIL_PORT
+// export const MAIL_SECURE = Number(MAIL_PORT) === 465
+// export const MAIL_USERNAME = process.env.MAIL_USERNAME
+// export const MAIL_PASSWORD = (process.env.MAIL_PASSWORD || '').replace(/\s+/g, '')
+// assert(!_.isEmpty(MAIL_HOST), assertMsg('MAIL_HOST'))
+// assert(!_.isEmpty(MAIL_PORT), assertMsg('MAIL_PORT'))
+// assert(!_.isEmpty(MAIL_USERNAME), assertMsg('MAIL_USERNAME'))
+// assert(!_.isEmpty(MAIL_PASSWORD), assertMsg('MAIL_PASSWORD'))
 
-assert(!_.isEmpty(MAIL_HOST), assertMsg('MAIL_HOST'))
-assert(!_.isEmpty(MAIL_PORT), assertMsg('MAIL_PORT'))
-assert(!_.isEmpty(MAIL_USERNAME), assertMsg('MAIL_USERNAME'))
-assert(!_.isEmpty(MAIL_PASSWORD), assertMsg('MAIL_PASSWORD'))
+// --- Brevo (gửi qua HTTPS API, không bị Render chặn) ---
+export const BREVO_API_KEY = process.env.BREVO_API_KEY
+assert(!_.isEmpty(BREVO_API_KEY), assertMsg('BREVO_API_KEY'))
+
+export const MAIL_FROM_ADDRESS = process.env.MAIL_FROM_ADDRESS || process.env.MAIL_USERNAME
+export const MAIL_FROM_NAME = process.env.MAIL_FROM_NAME || APP_NAME
 
 // Google OAuth2
 export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID

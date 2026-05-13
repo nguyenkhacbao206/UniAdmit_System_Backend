@@ -7,6 +7,24 @@ export async function loginUniversal(req, res) {
 
     if (loginResult.requires_otp) {
         const user = loginResult.user
+
+        if (loginResult.requires_verify) {
+            res.sendMail(user.email, `[${APP_NAME}] Xác thực tài khoản`, 'emails/verify-otp', {
+                name: user.name,
+                otp: user.otp,
+                appName: APP_NAME
+            })
+
+            res.jsonify({
+                requires_otp: true,
+                requires_verify: true,
+                account_type: 'user',
+                email: user.email,
+                message: 'Tài khoản chưa được xác thực. Mã OTP đã được gửi đến email của bạn.',
+            })
+            return
+        }
+
         res.sendMail(user.email, `[${APP_NAME}] Xác thực đăng nhập`, 'emails/login-otp', {
             name: user.name,
             otp: user.otp,

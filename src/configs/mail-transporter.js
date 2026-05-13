@@ -1,72 +1,59 @@
-import nodemailer from 'nodemailer'
+// --- Nodemailer SMTP (cũ - bị Render free chặn port 465/587) ---
+// import nodemailer from 'nodemailer'
+// const mailTransporter = nodemailer.createTransport({...})
 
-import {
-    MAIL_HOST,
-    MAIL_PORT,
-    MAIL_SECURE,
-    MAIL_USERNAME,
-    MAIL_PASSWORD,
-    MAIL_FROM_ADDRESS,
-    MAIL_FROM_NAME
-} from './constants'
+// --- Brevo (gửi qua HTTPS API, không bị Render chặn) ---
+import { BREVO_API_KEY, MAIL_FROM_ADDRESS, MAIL_FROM_NAME } from './constants'
 
-// Debug config khi server start
-console.log('MAIL CONFIG:', {
-    host: MAIL_HOST,
-    port: MAIL_PORT,
-    secure: MAIL_SECURE || Number(MAIL_PORT) === 465,
-    user: MAIL_USERNAME
-})
+console.log('MAIL CONFIG: Using Brevo API')
 
-// Tạo transporter
-const mailTransporter = nodemailer.createTransport({
-    host: MAIL_HOST || 'smtp.gmail.com',
-    port: Number(MAIL_PORT) || 465,
-    secure: MAIL_SECURE || Number(MAIL_PORT) === 465, // true = SSL (port 465), false = STARTTLS (port 587)
-    auth: {
-        user: MAIL_USERNAME,
-        pass: MAIL_PASSWORD
-    },
-    tls: {
-        rejectUnauthorized: false
-    },
-    connectionTimeout: 20000,
-    greetingTimeout: 20000,
-    socketTimeout: 20000
-})
-
-// Kiểm tra kết nối SMTP khi server start
-mailTransporter.verify()
-    .then(() => {
-        console.log('✅ SMTP Server is ready to send emails')
-    })
-    .catch((error) => {
-        console.error('❌ SMTP connection error:', error)
+async function sendViaBrevo({ to, subject, html }) {
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+            'api-key': BREVO_API_KEY,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            sender: { name: MAIL_FROM_NAME, email: MAIL_FROM_ADDRESS },
+            to: [{ email: to }],
+            subject,
+            htmlContent: html,
+        }),
     })
 
-// Hàm gửi mail
-export const sendMail = async ({ to, subject, html }) => {
-    try {
+    const data = await response.json()
 
-        const mailOptions = {
-            from: `"${MAIL_FROM_NAME || 'UniAdmit System'}" <${MAIL_FROM_ADDRESS || MAIL_USERNAME}>`,
-            to: to,
-            subject: subject,
-            html: html
-        }
-
-        const info = await mailTransporter.sendMail(mailOptions)
-
-        console.log('📧 Email sent:', info.messageId)
-
-        return info
-
-    } catch (error) {
-
-        console.error('❌ Send mail error:', error)
-
-        throw error
+    if (!response.ok) {
+        throw new Error(`Brevo error (${response.status}): ${data.message || JSON.stringify(data)}`)
     }
+
+    return data
+}
+
+const mailTransporter = {
+    sendMail(options, callback) {
+        sendViaBrevo({
+            to: options.to,
+            subject: options.subject,
+            html: options.html,
+        })
+            .then((result) => {
+                console.log('📧 Email sent via Brevo:', result.messageId)
+                if (callback) callback(null, result)
+            })
+            .catch((error) => {
+                console.error('❌ Brevo error:', error)
+                if (callback) callback(error)
+            })
+    },
+}
+
+export const sendMail = async ({ to, subject, html }) => {
+    const result = await sendViaBrevo({ to, subject, html })
+    console.log('📧 Email sent via Brevo:', result.messageId)
+    return result
 }
 
 export default mailTransporter
