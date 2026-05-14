@@ -86,21 +86,27 @@ export const sseStream = async (req, res) => {
 
     // SSE headers
     res.setHeader('Content-Type', 'text/event-stream')
-    res.setHeader('Cache-Control', 'no-cache')
+    res.setHeader('Cache-Control', 'no-cache, no-transform')
     res.setHeader('Connection', 'keep-alive')
     res.setHeader('Access-Control-Allow-Origin', '*')
+    res.setHeader('X-Accel-Buffering', 'no')
+    res.setHeader('Content-Encoding', 'none')
     res.flushHeaders()
 
     // Gửi connected event
     res.write(`data: ${JSON.stringify({ event: 'connected', userId: String(userId) })}\n\n`)
+    if (typeof res.flush === 'function') res.flush()
 
     // Đăng ký client
     addClient(userId, res)
 
-    // Heartbeat mỗi 25 giây để tránh timeout
+    // Heartbeat mỗi 20 giây để tránh proxy timeout
     const heartbeat = setInterval(() => {
-        res.write(': heartbeat\n\n')
-    }, 25000)
+        if (!res.writableEnded) {
+            res.write(': heartbeat\n\n')
+            if (typeof res.flush === 'function') res.flush()
+        }
+    }, 20000)
 
     // Xử lý khi client ngắt kết nối
     req.on('close', () => {
