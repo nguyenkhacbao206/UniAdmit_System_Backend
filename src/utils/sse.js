@@ -19,8 +19,9 @@ export function removeClient(userId) {
  */
 export function sendToUser(userId, data) {
     const res = clients.get(String(userId))
-    if (res) {
+    if (res && !res.writableEnded) {
         res.write(`data: ${JSON.stringify(data)}\n\n`)
+        if (typeof res.flush === 'function') res.flush()
     }
 }
 
