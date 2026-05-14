@@ -128,13 +128,15 @@ export async function universalLogin({ identifier, username, password }) {
         if (!user.verifyPassword(password)) abort(400, 'Tài khoản hoặc mật khẩu không đúng.')
         if (user.status === STATUS_ACCOUNT.INACTIVE) abort(400, 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản lý.')
 
-        await updateOTP(user)
+        // --- TẮT OTP ĐỂ TEST (bật lại khi demo) ---
+        // await updateOTP(user)
+        // if (user.status === STATUS_ACCOUNT.UNVERIFIED) {
+        //     return { user, roles: ['user'], account_type: 'user', requires_otp: true, requires_verify: true }
+        // }
+        // return { user, roles: ['user'], account_type: 'user', requires_otp: true }
 
-        if (user.status === STATUS_ACCOUNT.UNVERIFIED) {
-            return { user, roles: ['user'], account_type: 'user', requires_otp: true, requires_verify: true }
-        }
-
-        return { user, roles: ['user'], account_type: 'user', requires_otp: true }
+        const tokenData = authTokenUser(user)
+        return { user, tokenData, roles: ['user'], account_type: 'user' }
     }
 
     abort(400, 'Tài khoản hoặc mật khẩu không đúng.')
@@ -220,17 +222,10 @@ export async function registerUser(userData) {
         abort(400, 'Số điện thoại đã được sử dụng.')
     }
 
-    // Tạo user mới với status UNVERIFIED để bắt buộc xác thực qua email
-    let user = await User.create({
-        name,
-        email,
-        phone,
-        password,
-        status: STATUS_ACCOUNT.UNVERIFIED,
+    const user = await User.create({
+        name, email, phone, password,
+        status: STATUS_ACCOUNT.ACTIVE,
     })
-
-    // Tạo OTP xác thực ngay sau khi đăng ký
-    user = await updateOTP(user)
 
     return user
 }
