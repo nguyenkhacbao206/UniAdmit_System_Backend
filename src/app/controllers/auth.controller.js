@@ -5,40 +5,22 @@ import { abort } from '@/utils/helpers'
 export async function loginUniversal(req, res) {
     const loginResult = await authService.universalLogin(req.body)
 
-    if (loginResult.requires_otp) {
-        const user = loginResult.user
-
-        if (loginResult.requires_verify) {
-            res.sendMail(user.email, `[${APP_NAME}] Xác thực tài khoản`, 'emails/verify-otp', {
-                name: user.name,
-                otp: user.otp,
-                appName: APP_NAME
-            })
-
-            res.jsonify({
-                requires_otp: true,
-                requires_verify: true,
-                account_type: 'user',
-                email: user.email,
-                message: 'Tài khoản chưa được xác thực. Mã OTP đã được gửi đến email của bạn.',
-            })
-            return
-        }
-
-        res.sendMail(user.email, `[${APP_NAME}] Xác thực đăng nhập`, 'emails/login-otp', {
-            name: user.name,
-            otp: user.otp,
-            appName: APP_NAME
-        })
-
-        res.jsonify({
-            requires_otp: true,
-            account_type: 'user',
-            email: user.email,
-            message: 'Vui lòng kiểm tra email để lấy mã xác thực đăng nhập.',
-        })
-        return
-    }
+    // --- TẮT OTP ĐĂNG NHẬP ĐỂ TEST (bật lại khi demo) ---
+    // if (loginResult.requires_otp) {
+    //     const user = loginResult.user
+    //     res.sendMail(user.email, `[${APP_NAME}] Xác thực đăng nhập`, 'emails/login-otp', {
+    //         name: user.name,
+    //         otp: user.otp,
+    //         appName: APP_NAME
+    //     })
+    //     res.jsonify({
+    //         requires_otp: true,
+    //         account_type: 'user',
+    //         email: user.email,
+    //         message: 'Vui lòng kiểm tra email để lấy mã xác thực đăng nhập.',
+    //     })
+    //     return
+    // }
 
     // Lưu refresh token vào cookie (httpOnly)
     res.cookie('refreshToken', loginResult.tokenData.refresh_token, {

@@ -6,29 +6,47 @@ import * as authService from '@/app/services/auth.service'
 export async function login(req, res) {
     const user = await authService.checkValidLoginUser(req.body)
 
+    // --- TẮT OTP ĐỂ TEST (bật lại khi demo) ---
+    // if (user) {
+    //     await authService.updateOTP(user)
+    //     const isUnverified = user.status === 'UNVERIFIED'
+    //
+    //     const template = isUnverified ? 'emails/verify-otp' : 'emails/login-otp'
+    //     const subject = isUnverified
+    //         ? `[${APP_NAME}] Xác thực tài khoản`
+    //         : `[${APP_NAME}] Xác thực đăng nhập`
+    //
+    //     res.sendMail(user.email, subject, template, {
+    //         name: user.name,
+    //         otp: user.otp,
+    //         appName: APP_NAME
+    //     })
+    //
+    //     res.jsonify({
+    //         requires_otp: true,
+    //         ...(isUnverified && { requires_verify: true }),
+    //         message: isUnverified
+    //             ? 'Tài khoản chưa được xác thực. Mã OTP đã được gửi đến email của bạn.'
+    //             : 'Vui lòng kiểm tra email để lấy mã xác thực đăng nhập.',
+    //         email: user.email
+    //     })
+    // } else {
+    //     abort(400, 'Tài khoản hoặc mật khẩu không đúng.')
+    // }
+
     if (user) {
-        await authService.updateOTP(user)
-        const isUnverified = user.status === 'UNVERIFIED'
-
-        const template = isUnverified ? 'emails/verify-otp' : 'emails/login-otp'
-        const subject = isUnverified
-            ? `[${APP_NAME}] Xác thực tài khoản`
-            : `[${APP_NAME}] Xác thực đăng nhập`
-
-        res.sendMail(user.email, subject, template, {
-            name: user.name,
-            otp: user.otp,
-            appName: APP_NAME
+        const tokenData = authService.authTokenUser(user)
+        res.cookie('refreshToken', tokenData.refresh_token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'Lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
         })
-
         res.jsonify({
-            requires_otp: true,
-            ...(isUnverified && { requires_verify: true }),
-            message: isUnverified
-                ? 'Tài khoản chưa được xác thực. Mã OTP đã được gửi đến email của bạn.'
-                : 'Vui lòng kiểm tra email để lấy mã xác thực đăng nhập.',
-            email: user.email
-        })
+            access_token: tokenData.access_token,
+            expire_in: tokenData.expire_in,
+            auth_type: tokenData.auth_type,
+        }, 'Đăng nhập thành công.')
     } else {
         abort(400, 'Tài khoản hoặc mật khẩu không đúng.')
     }
@@ -57,12 +75,6 @@ export async function verifyLoginOTP(req, res) {
 export async function register(req, res) {
     const user = await authService.registerUser(req.body)
 
-    // Gửi mail OTP xác thực tài khoản
-    res.sendMail(user.email, `[${APP_NAME}] Xác thực tài khoản`, 'emails/verify-otp', {
-        name: user.name,
-        otp: user.otp,
-        appName: APP_NAME
-    })
 
     res.jsonify({
         message: 'Đăng ký tài khoản thành công. Vui lòng kiểm tra email để lấy mã xác thực.',
@@ -82,12 +94,12 @@ export async function resendOtp(req, res) {
     const { email } = req.body
     const user = await authService.resendOTP(email)
 
-    // Gửi mail OTP mới
-    res.sendMail(user.email, `[${APP_NAME}] Mã xác thực mới`, 'emails/verify-otp', {
-        name: user.name,
-        otp: user.otp,
-        appName: APP_NAME
-    })
+    // --- TẮT GỬI MAIL ĐỂ TEST (bật lại khi demo) ---
+    // res.sendMail(user.email, `[${APP_NAME}] Mã xác thực mới`, 'emails/verify-otp', {
+    //     name: user.name,
+    //     otp: user.otp,
+    //     appName: APP_NAME
+    // })
 
     res.jsonify({
         message: 'Mã xác thực mới đã được gửi vào email của bạn.',
@@ -99,12 +111,12 @@ export async function forgotPassword(req, res) {
     const { email } = req.body
     const user = await authService.resendOTP(email)
 
-    // Gửi mail OTP quên mật khẩu
-    res.sendMail(user.email, `[${APP_NAME}] Xác thực quên mật khẩu`, 'emails/forgot-password-otp', {
-        name: user.name,
-        otp: user.otp,
-        appName: APP_NAME
-    })
+    // --- TẮT GỬI MAIL ĐỂ TEST (bật lại khi demo) ---
+    // res.sendMail(user.email, `[${APP_NAME}] Xác thực quên mật khẩu`, 'emails/forgot-password-otp', {
+    //     name: user.name,
+    //     otp: user.otp,
+    //     appName: APP_NAME
+    // })
 
     res.jsonify({
         message: 'Mã xác thực quên mật khẩu đã được gửi vào email của bạn.',
