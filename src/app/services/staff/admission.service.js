@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import Application from '@/models/application.js'
 import User from '@/models/user.js'
 import Profile from '@/models/profile.js'
@@ -6,13 +7,11 @@ import NotificationService from '@/app/services/notification.service.js'
 
 class StaffAdmissionService {
     async getList(query = {}) {
-        const { page = 1, limit = 10, search, status, round_id, major_id, university_id } = query
+        const { page = 1, limit = 10, search, status, round_id } = query
 
-        const filter = {}
-        if (round_id) filter.round_id = round_id
-        if (major_id) filter.major_id = major_id
-        if (university_id) filter.university_id = university_id
-        if (status) filter.status = status
+        const appFilter = {}
+        if (round_id) appFilter.round_id = round_id
+        if (status) appFilter.status = status
 
         if (search) {
             const users = await User.find({
@@ -21,38 +20,63 @@ class StaffAdmissionService {
                     { email: { $regex: search, $options: 'i' } }
                 ]
             }).select('_id')
-
-            filter.user_id = { $in: users.map(u => u._id) }
+            appFilter.user_id = { $in: users.map(u => u._id) }
         }
 
-        const total = await Application.countDocuments(filter)
+        const totalCount = await Application.countDocuments(appFilter)
 
-        const applications = await Application.find(filter)
+        const apps = await Application.find(appFilter)
             .populate('university_id major_id round_id verified_by')
-            .sort({ createdAt: -1 })
+            .sort({ aspiration_order: 1 })
             .skip((page - 1) * limit)
             .limit(Number(limit))
 
-        const data = []
-        for (const app of applications) {
-            const user = await User.findById(app.user_id).select('-password -otp -otp_expired_at')
-            const profile = await Profile.findOne({ user_id: app.user_id })
-            const score = await Score.findOne({ user_id: app.user_id })
+        const userIds = [...new Set(apps.map(a => String(a.user_id)))]
 
-            data.push({
+        const [users, profiles, scores] = await Promise.all([
+            User.find({ _id: { $in: userIds } }).select('-password -otp -otp_expired_at'),
+            Profile.find({ user_id: { $in: userIds } }),
+            Score.find({ user_id: { $in: userIds } })
+        ])
+
+        const userMap = {}
+        for (const u of users) userMap[String(u._id)] = u
+        const profileMap = {}
+        for (const p of profiles) profileMap[String(p.user_id)] = p
+        const scoreMap = {}
+        for (const s of scores) scoreMap[String(s.user_id)] = s
+
+        const roundMatch = round_id
+            ? { round_id: new mongoose.Types.ObjectId(round_id) }
+            : {}
+        const countByUser = await Application.aggregate([
+            { $match: roundMatch },
+            { $group: { _id: '$user_id', count: { $sum: 1 } } }
+        ])
+        const countMap = {}
+        for (const c of countByUser) countMap[String(c._id)] = c.count
+
+        const data = apps.map(app => {
+            const uid = String(app.user_id)
+            const user = userMap[uid]
+            const profile = profileMap[uid]
+            const score = scoreMap[uid]
+
+            return {
                 ...app.toObject(),
-                student: {
-                    ...user?.toObject(),
+                applicationCount: countMap[uid] || 1,
+                student: user ? {
+                    ...user.toObject(),
                     profile: profile?.toObject(),
                     score: score?.toObject()
-                }
-            })
-        }
+                } : null
+            }
+        })
 
         return {
             data,
             pagination: {
-                total,
+                total: totalCount,
                 page: Number(page),
                 limit: Number(limit)
             }
