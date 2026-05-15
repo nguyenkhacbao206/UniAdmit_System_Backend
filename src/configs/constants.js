@@ -101,6 +101,14 @@ assert(!_.isEmpty(GOOGLE_CLIENT_ID), assertMsg('GOOGLE_CLIENT_ID'))
 assert(!_.isEmpty(GOOGLE_CLIENT_SECRET), assertMsg('GOOGLE_CLIENT_SECRET'))
 assert(!_.isEmpty(GOOGLE_CALLBACK_URL), assertMsg('GOOGLE_CALLBACK_URL'))
 
+// PayOS
+export const PAYOS_CLIENT_ID = process.env.PAYOS_CLIENT_ID
+export const PAYOS_API_KEY = process.env.PAYOS_API_KEY
+export const PAYOS_CHECKSUM_KEY = process.env.PAYOS_CHECKSUM_KEY
+assert(!_.isEmpty(PAYOS_CLIENT_ID), assertMsg('PAYOS_CLIENT_ID'))
+assert(!_.isEmpty(PAYOS_API_KEY), assertMsg('PAYOS_API_KEY'))
+assert(!_.isEmpty(PAYOS_CHECKSUM_KEY), assertMsg('PAYOS_CHECKSUM_KEY'))
+
 // other
 export const TOKEN_TYPE = {
     USER_AUTHORIZATION: 'USER_AUTHORIZATION',
