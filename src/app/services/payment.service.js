@@ -1,6 +1,41 @@
 import Invoice from '@/models/invoice.js'
+import Preference from '@/models/preference.js'
+import Application from '@/models/application.js'
+import NotificationService from '@/app/services/notification.service.js'
 
 class PaymentService {
+    async _checkCanPay(userId) {
+        const preferences = await Preference.find({ userId })
+        if (preferences.length === 0) {
+            throw new Error('Bạn chưa có nguyện vọng nào.')
+        }
+
+        const hasApproved = preferences.some(p => p.status === 'approved')
+        if (!hasApproved) {
+            await NotificationService.createAndPush(userId, {
+                title: 'Chưa thể thanh toán',
+                description: 'Hồ sơ của bạn chưa được duyệt. Vui lòng chờ staff xét duyệt hồ sơ trước khi thanh toán.',
+                type: 'warning',
+                metadata: { reason: 'preference_not_approved' }
+            }).catch(() => {})
+            throw new Error('Hồ sơ chưa được duyệt. Vui lòng chờ staff xét duyệt hồ sơ trước khi thanh toán.')
+        }
+
+        const applications = await Application.find({ user_id: userId })
+        if (applications.length > 0) {
+            const hasVerified = applications.some(a => a.status === 'verified')
+            if (!hasVerified) {
+                await NotificationService.createAndPush(userId, {
+                    title: 'Chưa thể thanh toán',
+                    description: 'Hồ sơ xét tuyển của bạn chưa được xác minh. Vui lòng chờ staff xác minh trước khi thanh toán.',
+                    type: 'warning',
+                    metadata: { reason: 'application_not_verified' }
+                }).catch(() => {})
+                throw new Error('Hồ sơ xét tuyển chưa được xác minh. Vui lòng chờ staff xác minh trước khi thanh toán.')
+            }
+        }
+    }
+
     async getInvoiceDetail(userId, roundId) {
         if (!roundId) throw new Error('Vui lòng chọn đợt xét tuyển')
 
@@ -10,6 +45,8 @@ class PaymentService {
         if (!invoice) {
             throw new Error('Vui lòng nộp hồ sơ trước khi thanh toán')
         }
+
+        await this._checkCanPay(userId)
 
         return invoice
     }
@@ -24,6 +61,8 @@ class PaymentService {
         }
 
         if (invoice.status === 'paid') return invoice
+
+        await this._checkCanPay(userId)
 
         invoice.status = 'paid'
         invoice.paymentMethod = paymentMethod || 'vnpay'
