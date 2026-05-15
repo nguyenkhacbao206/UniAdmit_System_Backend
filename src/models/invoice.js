@@ -42,10 +42,19 @@ const invoiceSchema = createModel(
         },
         paymentMethod: {
             type: String,
-            enum: ['vnpay', 'momo', 'bank_transfer', ''],
+            enum: ['payos', 'vnpay', 'momo', 'bank_transfer', ''],
             default: ''
         },
         transactionId: {
+            type: String,
+            default: ''
+        },
+        orderCode: {
+            type: Number,
+            default: null,
+            index: true
+        },
+        checkoutUrl: {
             type: String,
             default: ''
         },
