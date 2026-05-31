@@ -11,7 +11,34 @@
       "Read(//d/d/**)",
       "Bash(xargs ls -lt)",
       "Bash(npx babel *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(dir /B d:\\\\UniAdmit-System-Backend)",
+      "Bash(node --check src/app/services/forum-post.service.js)",
+      "Bash(node --check src/app/services/forum-comment.service.js)",
+      "Bash(node --check src/app/controllers/user/forum.controller.js)",
+      "Bash(node --check src/routes/user/forum.router.js)",
+      "Bash(node --check src/app/requests/user/forum.request.js)",
+      "Bash(git ls-tree *)",
+      "Bash(git fetch *)",
+      "Bash(git checkout *)",
+      "Bash(ls node_modules/react-onesignal/)",
+      "Bash(ls node_modules/react-onesignal/dist/)",
+      "Bash(yarn --version)",
+      "Bash(yarn cache *)",
+      "Bash(cd \"d:/UniAdmit-System-Frontend\" && rm -rf node_modules/react-onesignal node_modules/.cache src/.umi && echo \"cleaned\")",
+      "Bash(yarn add *)",
+      "Bash(npm view *)",
+      "Bash(cp /tmp/test-joi.js ./_test-joi.js)",
+      "Bash(node _test-joi.js)",
+      "Bash(rm ./_test-joi.js)",
+      "Bash(curl -sS -X POST -H \"Content-Type: application/json\" -d '{\"title\":\"test\"}' http://localhost:8082/user/forum/posts -w \"\\\\n\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/user/forum/trending -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/user/forum/posts -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(npx eslint *)",
+      "Bash(grep -lE *)"
+    ],
+    "additionalDirectories": [
+      "d:\\UniAdmit-System-Frontend\\node_modules\\react-onesignal"
     ]
   }
 }

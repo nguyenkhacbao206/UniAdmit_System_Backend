@@ -10,6 +10,7 @@ import paymentRouter from './payment.router'
 import enrollmentRouter from './enrollment.router'
 import notificationRouter from './notification.router'
 import applicationRouter from './application.router'
+import forumRouter from './forum.router'
 
 const user = Router()
 
@@ -23,5 +24,6 @@ user.use('/payment', paymentRouter)
 user.use('/enrollment', enrollmentRouter)
 user.use('/notifications', notificationRouter)
 user.use('/applications', applicationRouter)
+user.use('/forum', forumRouter)
 
 export default user
