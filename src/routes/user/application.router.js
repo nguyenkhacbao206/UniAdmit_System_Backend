@@ -11,6 +11,7 @@ applicationRouter.post('/', asyncHandler(applicationController.create))
 applicationRouter.get('/my', asyncHandler(applicationController.getMyApplications))
 applicationRouter.get('/my-result', asyncHandler(applicationController.getMyResult))
 applicationRouter.post('/confirm-admission', asyncHandler(applicationController.confirmAdmission))
+applicationRouter.patch('/reorder', asyncHandler(applicationController.reorder))
 applicationRouter.delete('/:id', asyncHandler(applicationController.deleteApplication))
 
 export default applicationRouter

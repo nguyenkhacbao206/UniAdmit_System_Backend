@@ -5,13 +5,28 @@ import Score from '@/models/score.js'
 import AdmissionResult from '@/models/admission-result.js'
 import Invoice from '@/models/invoice.js'
 
+// Single source of truth: a round only accepts new aspirations/edits when BOTH
+// (a) admin status is 'open' AND (b) the current time is still within the registration window.
+// An expired endDate makes the round effectively closed even if admin forgot to flip status.
+const assertRoundOpenForRegistration = (round) => {
+    if (!round) throw new Error('Không tìm thấy đợt tuyển sinh')
+    if (round.status !== 'open') {
+        throw new Error('Đợt tuyển sinh đã đóng, không thể đăng ký')
+    }
+    if (round.endDate && new Date() > new Date(round.endDate)) {
+        throw new Error('Đợt tuyển sinh đã hết hạn, không thể đăng ký')
+    }
+    if (round.startDate && new Date() < new Date(round.startDate)) {
+        throw new Error('Đợt tuyển sinh chưa mở, vui lòng quay lại sau')
+    }
+}
+
 class ApplicationService {
     async create(userId, data) {
         const { round_id, university_id, major_id, aspiration_order, method, combination } = data
 
         const round = await Round.findById(round_id)
-        if (!round) throw new Error('Không tìm thấy đợt tuyển sinh')
-        if (round.status !== 'open') throw new Error('Đợt tuyển sinh đã đóng, không thể đăng ký')
+        assertRoundOpenForRegistration(round)
 
         const submittedInvoice = await Invoice.findOne({ userId, round_id, isSubmitted: true })
         if (submittedInvoice) throw new Error('Đợt này đã nộp hồ sơ, không thể thêm nguyện vọng')
@@ -122,14 +137,51 @@ class ApplicationService {
         return application
     }
 
+    async reorder(userId, list) {
+        if (!Array.isArray(list) || list.length === 0) {
+            throw new Error('Danh sách sắp xếp không hợp lệ')
+        }
+
+        const ids = list.map((item) => item.id).filter(Boolean)
+        const apps = await Application.find({ _id: { $in: ids }, user_id: userId })
+        if (apps.length !== ids.length) {
+            throw new Error('Một số nguyện vọng không thuộc về bạn hoặc không tồn tại')
+        }
+
+        // Check every round involved is still accepting edits
+        const uniqueRoundIds = [...new Set(apps.map((a) => String(a.round_id)))]
+        const rounds = await Round.find({ _id: { $in: uniqueRoundIds } })
+        for (const round of rounds) {
+            assertRoundOpenForRegistration(round)
+        }
+
+        const submitted = await Invoice.findOne({
+            userId,
+            round_id: { $in: apps.map((a) => a.round_id) },
+            isSubmitted: true,
+        })
+        if (submitted) {
+            throw new Error('Đợt này đã nộp hồ sơ, không thể sắp xếp lại')
+        }
+
+        await Promise.all(
+            list.map((item) =>
+                Application.updateOne(
+                    { _id: item.id, user_id: userId },
+                    { $set: { aspiration_order: Number(item.aspiration_order ?? item.priority ?? 0) } }
+                )
+            )
+        )
+
+        return { updated: list.length }
+    }
+
     async deleteApplication(userId, applicationId) {
         const application = await Application.findOne({ _id: applicationId, user_id: userId })
         if (!application) throw new Error('Không tìm thấy hồ sơ')
 
         const round = await Round.findById(application.round_id)
-        if (!round || round.status !== 'open') {
-            throw new Error('Đợt tuyển sinh đã đóng, không thể hủy đăng ký')
-        }
+        assertRoundOpenForRegistration(round)
 
         const submittedInvoice = await Invoice.findOne({ userId, round_id: application.round_id, isSubmitted: true })
         if (submittedInvoice) throw new Error('Đợt này đã nộp hồ sơ, không thể hủy nguyện vọng')

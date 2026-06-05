@@ -80,6 +80,26 @@ export const confirmAdmission = async (req, res) => {
     }
 }
 
+export const reorder = async (req, res) => {
+    try {
+        const userId = req.currentUser._id
+        const { list } = req.body
+
+        const result = await applicationService.reorder(userId, list)
+
+        return res.status(200).json({
+            success: true,
+            message: 'Sắp xếp lại nguyện vọng thành công',
+            data: result
+        })
+    } catch (err) {
+        return res.status(400).json({
+            success: false,
+            message: err.message || 'Lỗi server'
+        })
+    }
+}
+
 export const deleteApplication = async (req, res) => {
     try {
         const userId = req.currentUser._id
