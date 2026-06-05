@@ -2,8 +2,10 @@ version: '3.8'
 
 services:
   backend:
-    # build: .
     image: kbao17122006/uniadmit-backend:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: uniadmit-backend
     ports:
       - "8082:8082"

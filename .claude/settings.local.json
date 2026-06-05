@@ -35,7 +35,14 @@
       "Bash(curl -sS http://localhost:8082/user/forum/trending -w \"\\\\nHTTP: %{http_code}\\\\n\")",
       "Bash(curl -sS http://localhost:8082/user/forum/posts -w \"\\\\nHTTP: %{http_code}\\\\n\")",
       "Bash(npx eslint *)",
-      "Bash(grep -lE *)"
+      "Bash(grep -lE *)",
+      "Bash(curl -sS http://localhost:8082/user/payment/return -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/user/payment/invoice -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/user/applications -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/user/enrollment/summary -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/api/user/supplements/my-requests -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/user/supplements/my-requests -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/user/payment/status -w \"\\\\nHTTP: %{http_code}\\\\n\")"
     ],
     "additionalDirectories": [
       "d:\\UniAdmit-System-Frontend\\node_modules\\react-onesignal"
