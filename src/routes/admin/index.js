@@ -11,6 +11,7 @@ import paymentRouter from './payment.router'
 import roundRouter from './round.router'
 import admissionRouter from './admission.router'
 import dashboardRouter from './dashboard.router'
+import forumRouter from './forum.router'
 
 const admin = Router()
 
@@ -26,5 +27,6 @@ admin.use('/payment', paymentRouter)
 admin.use('/rounds', roundRouter)
 admin.use('/admission', admissionRouter)
 admin.use('/dashboard', dashboardRouter)
+admin.use('/forum', forumRouter)
 
 export default admin

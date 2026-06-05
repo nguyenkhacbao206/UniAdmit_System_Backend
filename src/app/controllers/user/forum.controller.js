@@ -1,5 +1,6 @@
 import forumPostService from '@/app/services/forum-post.service'
 import forumCommentService from '@/app/services/forum-comment.service'
+import forumAdminService from '@/app/services/forum-admin.service'
 
 const ok = (res, data, message = 'Thành công', status = 200) =>
     res.status(status).json({ success: true, message, data })
@@ -43,6 +44,16 @@ export const getPopularTags = async (req, res) => {
     try {
         const data = await forumPostService.getPopularTags(req.query.limit)
         return ok(res, data, 'Lấy tag phổ biến thành công')
+    } catch (err) {
+        return fail(res, err, 500)
+    }
+}
+
+export const getTopMentors = async (req, res) => {
+    try {
+        const limit = req.query.limit ? Number(req.query.limit) : 5
+        const data = await forumAdminService.getTopMentors(limit)
+        return ok(res, data, 'Lấy mentor nổi bật thành công')
     } catch (err) {
         return fail(res, err, 500)
     }

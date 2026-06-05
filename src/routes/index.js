@@ -7,6 +7,7 @@ import staffApplication from './staff/application.router'
 import staffSupplement from './staff/supplement.router'
 import staffAdmission from './staff/admission.router'
 import staffDashboard from './staff/dashboard.router'
+import staffForum from './staff/forum.router'
 import userSupplementRouter from './user/supplement.router'
 import fileRouter from './file.router'
 
@@ -27,6 +28,7 @@ function route(app) {
     app.use('/staff/supplements', staffSupplement)
     app.use('/staff/admission', staffAdmission)
     app.use('/staff/dashboard', staffDashboard)
+    app.use('/staff/forum', staffForum)
     app.use('/staff', staff)
 
     // API prefix routes for frontend compatibility
@@ -41,6 +43,7 @@ function route(app) {
     app.use('/api/staff/supplements', staffSupplement)
     app.use('/api/staff/admission', staffAdmission)
     app.use('/api/staff/dashboard', staffDashboard)
+    app.use('/api/staff/forum', staffForum)
     app.use('/api/staff', staff)
 }
 

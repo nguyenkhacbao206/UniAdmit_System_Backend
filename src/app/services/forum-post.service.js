@@ -1,4 +1,5 @@
-import { ForumPost, ForumVote, ForumBookmark, ForumReport, User, Staff, Admin } from '@/models'
+import { ForumPost, ForumVote, ForumBookmark, ForumReport, ForumSetting, User, Staff, Admin } from '@/models'
+import { auditLog } from '@/app/services/forum-admin.service'
 
 // Lookup authors across User / Staff / Admin collections in a single round-trip per type,
 // then return a Map keyed by string(id) → {_id, name, avatar, email, account_type}
@@ -52,6 +53,39 @@ const attachAuthor = (doc, map) => {
 class ForumPostService {
     async createPost(accountId, body, accountType = 'User') {
         const images = Array.isArray(body.images) ? body.images : []
+
+        // Apply settings: auto-approve Mentor/Staff/Admin posts when enabled;
+        // anything else stays PENDING when autoApprove is off.
+        let setting = null
+        try {
+            setting = await ForumSetting.findOne({ scope: 'forum' })
+        } catch (e) { /* ignore */ }
+        const autoApproveMentors = setting ? setting.autoApproveMentors : true
+
+        let status = 'APPROVED'
+        if (accountType === 'User') {
+            // Default for regular candidates remains APPROVED (the historical default);
+            // moderators can later toggle this by adding a per-role gate in settings.
+            status = 'APPROVED'
+        } else if (accountType === 'Staff' || accountType === 'Admin') {
+            status = autoApproveMentors ? 'APPROVED' : 'PENDING'
+        }
+
+        // Banned words filter
+        const banned = (setting?.bannedWords || []).filter(Boolean)
+        if (banned.length) {
+            const hay = `${body.title || ''} ${body.content || ''}`.toLowerCase()
+            const hit = banned.some((w) => w && hay.includes(w))
+            if (hit) {
+                const action = setting?.toxicAction || 'hide'
+                if (action === 'delete') {
+                    throw new Error('Bài viết chứa từ ngữ không được phép.')
+                }
+                if (action === 'hide') status = 'PENDING'
+                // 'censor' would replace words; left as a no-op for now.
+            }
+        }
+
         const post = await ForumPost.create({
             title: body.title,
             content: body.content || '',
@@ -60,7 +94,19 @@ class ForumPostService {
             images,
             author_id: accountId,
             author_type: accountType,
+            status,
         })
+
+        await auditLog({
+            actor: { id: accountId, type: accountType },
+            action: 'post_create',
+            actionLabel: status === 'PENDING' ? 'Đăng bài (chờ duyệt)' : 'Đăng bài',
+            targetType: 'ForumPost',
+            targetId: post._id,
+            targetLabel: post.title?.slice(0, 80),
+            status: status === 'PENDING' ? 'warning' : 'success',
+        })
+
         return post
     }
 

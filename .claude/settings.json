@@ -10,7 +10,30 @@
       "Bash(ls src/pages/User/TrangChu src/pages/Staff/StaffDashboard src/pages/Admin/AdminDashboard)",
       "Bash(wc -l src/pages/User/TrangChu/index.tsx src/pages/Staff/StaffDashboard/index.tsx src/pages/Admin/AdminDashboard/index.tsx)",
       "Bash(curl -sS http://localhost:8082/admin/dashboard -w \"\\\\nHTTP: %{http_code}\\\\n\")",
-      "Bash(curl -sS http://localhost:8082/staff/dashboard -w \"\\\\nHTTP: %{http_code}\\\\n\")"
+      "Bash(curl -sS http://localhost:8082/staff/dashboard -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/admin/forum/overview -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/staff/forum/posts/pending -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/user/forum/top-mentors -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/admin/forum/tags -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/admin/admission -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/ -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/admin/forum -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/api/admin/forum/overview -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/api/admin/forum/tags -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/user/forum/tags -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(sed -n '286,302p' src/pages/Forum/components/CommentSection.tsx)",
+      "Bash(sed -n '430,442p' src/pages/Forum/components/CommentSection.tsx)",
+      "Bash(node \"d:/tmp/fe-tree.js\")",
+      "Bash(node -e ' *)",
+      "Bash(node \"d:/tmp/refresh-feed.js\")",
+      "Bash(node \"d:/tmp/ctrl.js\")",
+      "Bash(node \"d:/tmp/ctrl2.js\")",
+      "Bash(grep -rnE \"<Avatar|\\\\\\\\.avatar\" src/pages/User/HoSo src/pages/User/TrangChu)",
+      "Bash(grep -nE \"<Avatar src=\\\\\\\\{\\(post|comment|reply|currentUser|m\\)\\\\\\\\.\\\\\\\\w+\\\\\\\\.avatar|<Avatar src=\\\\\\\\{currentUser\\\\\\\\.avatar\" src/pages/Forum/components/PostCard.tsx src/pages/Forum/components/CommentSection.tsx src/pages/Forum/PostDetail/index.tsx src/pages/Forum/components/ForumSidebar.tsx)",
+      "Bash(node \"d:/tmp/initial-avatars.js\")"
+    ],
+    "additionalDirectories": [
+      "d:\\tmp"
     ]
   }
 }
