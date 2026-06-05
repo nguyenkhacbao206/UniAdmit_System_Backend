@@ -10,7 +10,30 @@ const paymentRequests = new PaymentRequests(payosClient)
 const webhooks = new Webhooks(payosClient)
 
 class PaymentService {
-    async _checkCanPay(userId) {
+    async _checkCanPay(userId, roundId) {
+        // Application-first: new flow uses Application model.
+        // If user has Applications (for the round if provided), only check Application.status.
+        const appFilter = { user_id: userId }
+        if (roundId) appFilter.round_id = roundId
+        const applications = await Application.find(appFilter)
+
+        if (applications.length > 0) {
+            // 'verified' or terminal positive states unblock payment
+            const unblockingStatuses = ['verified', 'passed']
+            const hasUnblocked = applications.some(a => unblockingStatuses.includes(a.status))
+            if (!hasUnblocked) {
+                await NotificationService.createAndPush(userId, {
+                    title: 'Chưa thể thanh toán',
+                    description: 'Hồ sơ xét tuyển của bạn chưa được duyệt. Vui lòng chờ staff xác minh trước khi thanh toán.',
+                    type: 'warning',
+                    metadata: { reason: 'application_not_verified' }
+                }).catch(() => {})
+                throw new Error('Hồ sơ chưa được duyệt. Vui lòng chờ staff xác minh trước khi thanh toán.')
+            }
+            return
+        }
+
+        // Legacy fallback: only Preferences (old model) exist
         const preferences = await Preference.find({ userId })
         if (preferences.length === 0) {
             throw new Error('Bạn chưa có nguyện vọng nào.')
@@ -25,20 +48,6 @@ class PaymentService {
                 metadata: { reason: 'preference_not_approved' }
             }).catch(() => {})
             throw new Error('Hồ sơ chưa được duyệt. Vui lòng chờ staff xét duyệt hồ sơ trước khi thanh toán.')
-        }
-
-        const applications = await Application.find({ user_id: userId })
-        if (applications.length > 0) {
-            const hasVerified = applications.some(a => a.status === 'verified')
-            if (!hasVerified) {
-                await NotificationService.createAndPush(userId, {
-                    title: 'Chưa thể thanh toán',
-                    description: 'Hồ sơ xét tuyển của bạn chưa được xác minh. Vui lòng chờ staff xác minh trước khi thanh toán.',
-                    type: 'warning',
-                    metadata: { reason: 'application_not_verified' }
-                }).catch(() => {})
-                throw new Error('Hồ sơ xét tuyển chưa được xác minh. Vui lòng chờ staff xác minh trước khi thanh toán.')
-            }
         }
     }
 
@@ -82,7 +91,11 @@ class PaymentService {
         }
 
         await this._syncPendingInvoices([invoice])
-        await this._checkCanPay(userId)
+
+        // Skip approval guard if invoice is already paid (user can always view a paid invoice)
+        if (invoice.status !== 'paid') {
+            await this._checkCanPay(userId, roundId)
+        }
 
         return invoice
     }
@@ -103,7 +116,7 @@ class PaymentService {
             throw new Error('Hóa đơn này đã được thanh toán.')
         }
 
-        await this._checkCanPay(userId)
+        await this._checkCanPay(userId, roundId)
 
         if (invoice.checkoutUrl && invoice.orderCode && invoice.status === 'pending') {
             try {
@@ -219,7 +232,7 @@ class PaymentService {
         if (!invoice) throw new Error('Vui lòng nộp hồ sơ trước khi thanh toán')
         if (invoice.status === 'paid') throw new Error('Hóa đơn này đã được thanh toán.')
 
-        await this._checkCanPay(userId)
+        await this._checkCanPay(userId, roundId)
 
         invoice.status = 'paid'
         invoice.paymentMethod = invoice.paymentMethod || 'bank_transfer'

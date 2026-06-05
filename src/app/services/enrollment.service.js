@@ -139,6 +139,18 @@ class EnrollmentService {
         const round = await Round.findById(roundId)
         if (!round) throw new Error('Không tìm thấy đợt xét tuyển')
 
+        // Block submission once the registration deadline has passed,
+        // even if admin forgot to flip round.status to 'closed'.
+        if (round.status !== 'open') {
+            throw new Error('Đợt tuyển sinh đã đóng, không thể nộp hồ sơ')
+        }
+        if (round.endDate && new Date() > new Date(round.endDate)) {
+            throw new Error('Đợt tuyển sinh đã hết hạn, không thể nộp hồ sơ')
+        }
+        if (round.startDate && new Date() < new Date(round.startDate)) {
+            throw new Error('Đợt tuyển sinh chưa mở, vui lòng quay lại sau')
+        }
+
         const profile = await Profile.findOne({ user_id: userId })
         if (!profile || !profile.cccd) {
             throw new Error('Vui lòng hoàn thiện hồ sơ cá nhân')
