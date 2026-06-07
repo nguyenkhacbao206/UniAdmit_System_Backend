@@ -1,0 +1,99 @@
+yarn run v1.22.22
+$ nodemon
+[33m[nodemon] 3.1.6[39m
+[33m[nodemon] reading config .\nodemon.json[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] or send SIGHUP to 12180 to restart[39m
+[33m[nodemon] watching path(s): src\**\* .env[39m
+[33m[nodemon] watching extensions: js[39m
+[32m[nodemon] starting `babel-node src/main.js`[39m
+[33m[nodemon] spawning[39m
+[33m[nodemon] child pid: 2988[39m
+[33m[nodemon] watching 214 files[39m
+MAIL CONFIG: Using Brevo API
+Server is running on http://localhost:8082 in development mode.
+Database connection successful!
+
+D:\UniAdmit-System-Backend\src\app\controllers\auth.controller.js
+  2:10  warning  'APP_NAME' is defined but never used  no-unused-vars
+
+D:\UniAdmit-System-Backend\src\app\controllers\user\auth.controller.js
+  3:87  warning  'APP_NAME' is defined but never used  no-unused-vars
+
+D:\UniAdmit-System-Backend\src\app\services\forum-admin.service.js
+    1:8   warning  'mongoose' is defined but never used             no-unused-vars
+    6:5   warning  'ForumVote' is defined but never used            no-unused-vars
+  387:15  warning  'since7Days' is assigned a value but never used  no-unused-vars
+
+✖ 5 problems (0 errors, 5 warnings)
+
+[2026-06-07 17:08:05] GET /user/forum/trending 200 - 306B - 62ms
+[2026-06-07 17:08:12] GET /user/account/preferences 401 - 86B - 2ms
+[33m[nodemon] files triggering change check: .env[39m
+[33m[nodemon] matched rule: D:\UniAdmit-System-Backend\.env[39m
+[33m[nodemon] changes after filters (before/after): 1/1[39m
+[32m[nodemon] restarting due to changes...[39m
+[33m[nodemon] .env[39m
+
+[32m[nodemon] starting `babel-node src/main.js`[39m
+[33m[nodemon] spawning[39m
+[33m[nodemon] child pid: 9300[39m
+MAIL CONFIG: Using Brevo API
+Server is running on http://localhost:8083 in development mode.
+Database connection successful!
+
+D:\UniAdmit-System-Backend\src\app\controllers\auth.controller.js
+  2:10  warning  'APP_NAME' is defined but never used  no-unused-vars
+
+D:\UniAdmit-System-Backend\src\app\controllers\user\auth.controller.js
+  3:87  warning  'APP_NAME' is defined but never used  no-unused-vars
+
+D:\UniAdmit-System-Backend\src\app\services\forum-admin.service.js
+    1:8   warning  'mongoose' is defined but never used             no-unused-vars
+    6:5   warning  'ForumVote' is defined but never used            no-unused-vars
+  387:15  warning  'since7Days' is assigned a value but never used  no-unused-vars
+
+✖ 5 problems (0 errors, 5 warnings)
+
+[33m[nodemon] files triggering change check: .env[39m
+[33m[nodemon] matched rule: D:\UniAdmit-System-Backend\.env[39m
+[33m[nodemon] changes after filters (before/after): 1/1[39m
+[32m[nodemon] restarting due to changes...[39m
+[33m[nodemon] .env[39m
+
+[32m[nodemon] starting `babel-node src/main.js`[39m
+[33m[nodemon] spawning[39m
+[33m[nodemon] child pid: 24336[39m
+MAIL CONFIG: Using Brevo API
+Server is running on http://localhost:8082 in development mode.
+Database connection successful!
+
+D:\UniAdmit-System-Backend\src\app\controllers\auth.controller.js
+  2:10  warning  'APP_NAME' is defined but never used  no-unused-vars
+
+D:\UniAdmit-System-Backend\src\app\controllers\user\auth.controller.js
+  3:87  warning  'APP_NAME' is defined but never used  no-unused-vars
+
+D:\UniAdmit-System-Backend\src\app\services\forum-admin.service.js
+    1:8   warning  'mongoose' is defined but never used             no-unused-vars
+    6:5   warning  'ForumVote' is defined but never used            no-unused-vars
+  387:15  warning  'since7Days' is assigned a value but never used  no-unused-vars
+
+✖ 5 problems (0 errors, 5 warnings)
+
+[33m[nodemon] files triggering change check: .env[39m
+[33m[nodemon] matched rule: D:\UniAdmit-System-Backend\.env[39m
+[33m[nodemon] changes after filters (before/after): 1/1[39m
+[32m[nodemon] restarting due to changes...[39m
+[33m[nodemon] .env[39m
+
+[32m[nodemon] starting `babel-node src/main.js`[39m
+[33m[nodemon] spawning[39m
+[33m[nodemon] child pid: 10664[39m
+MAIL CONFIG: Using Brevo API
+Error: listen EADDRINUSE: address already in use ::1:8083
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at GetAddrInfoReqWrap.callback (node:net:2206:7)
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:134:8)
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m

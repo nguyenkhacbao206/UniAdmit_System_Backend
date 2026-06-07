@@ -49,6 +49,17 @@ export const getPopularTags = async (req, res) => {
     }
 }
 
+// Danh sách tag được Staff/Admin tạo trong "Quản lý Tag", hiển thị ở dropdown
+// khi user soạn bài. Chỉ trả tag status='active'.
+export const getActiveTags = async (req, res) => {
+    try {
+        const data = await forumPostService.getActiveTags()
+        return ok(res, data, 'Lấy danh sách tag thành công')
+    } catch (err) {
+        return fail(res, err, 500)
+    }
+}
+
 export const getTopMentors = async (req, res) => {
     try {
         const limit = req.query.limit ? Number(req.query.limit) : 5
@@ -71,13 +82,16 @@ export const getPost = async (req, res) => {
 
 export const createPost = async (req, res) => {
     try {
-        console.log('[forum.createPost] account:', getAccountType(req), getAccountId(req), 'body:', JSON.stringify(req.body))
         const data = await forumPostService.createPost(
             getAccountId(req),
             req.body,
             getAccountType(req)
         )
-        return ok(res, data, 'Đăng bài thành công', 201)
+        const isPending = data?.status === 'PENDING'
+        const message = isPending
+            ? 'Đã gửi bài viết. Bài đang chờ ban quản trị duyệt trước khi hiển thị.'
+            : 'Đăng bài thành công'
+        return ok(res, data, message, 201)
     } catch (err) {
         console.error('[forum.createPost] error:', err)
         return fail(res, err)

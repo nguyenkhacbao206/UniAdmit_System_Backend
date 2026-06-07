@@ -15,6 +15,12 @@ const ForumSetting = createModel(
             type: Boolean,
             default: true,
         },
+        // When true (default), every post by a regular User goes to PENDING
+        // and must be approved by staff before it appears on the forum.
+        requireUserApproval: {
+            type: Boolean,
+            default: true,
+        },
         toxicAction: {
             type: String,
             enum: ['hide', 'delete', 'censor'],

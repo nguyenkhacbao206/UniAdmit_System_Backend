@@ -11,6 +11,7 @@ import {
     Staff,
     Admin,
 } from '@/models'
+import { resolveAuthors, attachAuthor } from './forum-post.service'
 
 const DEFAULT_SETTING = {
     scope: 'forum',
@@ -206,7 +207,12 @@ class ForumAdminService {
             .limit(Number(limit))
             .lean()
 
-        return { items: posts, total, page: Number(page), limit: Number(limit) }
+        const authorMap = await resolveAuthors(
+            posts.map((p) => ({ id: p.author_id, type: p.author_type || 'User' }))
+        )
+        const items = posts.map((p) => attachAuthor(p, authorMap))
+
+        return { items, total, page: Number(page), limit: Number(limit) }
     }
 
     async getReportedItems(query = {}) {
@@ -295,6 +301,12 @@ class ForumAdminService {
         if (!post) throw new Error('Không tìm thấy bài viết')
         post.deleted = true
         await post.save()
+        // Auto-resolve mọi report đang PENDING trỏ tới bài này — staff đã xử lý
+        // bằng cách xóa nội dung, không cần resolve từng report một.
+        await ForumReport.updateMany(
+            { post_id: post._id, status: 'PENDING' },
+            { $set: { status: 'RESOLVED' } }
+        )
         await this.log({
             actor,
             action: 'post_delete',
@@ -314,6 +326,11 @@ class ForumAdminService {
         comment.deleted = true
         await comment.save()
         await ForumPost.updateOne({ _id: comment.post_id }, { $inc: { comments_count: -1 } })
+        // Auto-resolve mọi report đang PENDING trỏ tới comment này.
+        await ForumReport.updateMany(
+            { comment_id: comment._id, status: 'PENDING' },
+            { $set: { status: 'RESOLVED' } }
+        )
         await this.log({
             actor,
             action: 'comment_delete',

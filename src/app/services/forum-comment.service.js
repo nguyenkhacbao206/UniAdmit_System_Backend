@@ -1,5 +1,23 @@
-import { ForumComment, ForumPost, ForumVote, ForumReport } from '@/models'
+import { ForumComment, ForumPost, ForumVote, ForumReport, Staff, Admin } from '@/models'
 import { resolveAuthors, attachAuthor } from './forum-post.service'
+import NotificationService from '@/app/services/notification.service.js'
+
+const notifyModerators = async ({ title, description, metadata }) => {
+    try {
+        const [staffList, adminList] = await Promise.all([
+            Staff.find({ deleted: false }).select('_id'),
+            Admin.find({ deleted: false }).select('_id'),
+        ])
+        const recipients = [...staffList, ...adminList]
+        await Promise.all(
+            recipients.map((m) =>
+                NotificationService.createAndPush(m._id, {
+                    title, description, type: 'system', metadata,
+                }).catch(() => {})
+            )
+        )
+    } catch (e) { /* swallow */ }
+}
 
 class ForumCommentService {
     async createComment(accountId, postId, body, accountType = 'User') {
@@ -186,12 +204,21 @@ class ForumCommentService {
             throw new Error('Bạn đã báo cáo bình luận này')
         }
 
-        return await ForumReport.create({
+        const report = await ForumReport.create({
             comment_id: commentId,
             reporter_id: accountId,
             reason: body.reason,
             details: body.details || '',
         })
+
+        const snippet = (comment.content || '').slice(0, 80)
+        await notifyModerators({
+            title: '⚠️ Có báo cáo bình luận mới',
+            description: `Bình luận "${snippet}" vừa bị báo cáo (lý do: ${body.reason || 'không rõ'}).`,
+            metadata: { reportId: String(report._id), commentId: String(comment._id), kind: 'pending_report' },
+        })
+
+        return report
     }
 }
 
