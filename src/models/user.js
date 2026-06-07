@@ -70,6 +70,18 @@ const User = createModel(
             type: Date,
             default: null,
         },
+        // Cài đặt cá nhân — user tự bật/tắt trong trang "Cài đặt hệ thống".
+        notification_preferences: {
+            resultUpdates:   { type: Boolean, default: true },
+            applicationReminders: { type: Boolean, default: true },
+            paymentReminders:   { type: Boolean, default: true },
+            pushNotifications:  { type: Boolean, default: false },
+        },
+        language: {
+            type: String,
+            enum: ['vi', 'en'],
+            default: 'vi',
+        },
         deleted: {
             type: Boolean,
             required: true,

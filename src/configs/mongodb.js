@@ -1,5 +1,12 @@
 import mongoose from 'mongoose'
+import dns from 'dns'
 import {DATABASE_URI, DB_NAME, DB_USERNAME, DB_PASSWORD, DB_AUTH_SOURCE} from './constants'
+
+// Một số ISP / mạng nội bộ ở VN không trả về SRV record cho mongodb+srv://.
+// Dev local: ép dùng Google + Cloudflare DNS để node resolver lấy được _mongodb._tcp...
+if (process.env.NODE_ENV !== 'production') {
+    try { dns.setServers(['8.8.8.8', '1.1.1.1']) } catch { /* ignore */ }
+}
 
 const mongoDb = {
     connect() {

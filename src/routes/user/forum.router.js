@@ -10,6 +10,7 @@ const router = Router()
 // Public endpoints (sidebar widgets) — no auth required
 router.get('/trending', asyncHandler(forumController.getTrending))
 router.get('/tags', asyncHandler(forumController.getPopularTags))
+router.get('/active-tags', asyncHandler(forumController.getActiveTags))
 router.get('/top-mentors', asyncHandler(forumController.getTopMentors))
 
 // Auth required for everything else
