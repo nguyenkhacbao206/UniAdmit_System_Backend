@@ -11,6 +11,7 @@ import enrollmentRouter from './enrollment.router'
 import notificationRouter from './notification.router'
 import applicationRouter from './application.router'
 import forumRouter from './forum.router'
+import accountRouter from './account.router'
 
 const user = Router()
 
@@ -25,5 +26,8 @@ user.use('/enrollment', enrollmentRouter)
 user.use('/notifications', notificationRouter)
 user.use('/applications', applicationRouter)
 user.use('/forum', forumRouter)
+user.use('/account', accountRouter)
+// account routes mounted
 
 export default user
+

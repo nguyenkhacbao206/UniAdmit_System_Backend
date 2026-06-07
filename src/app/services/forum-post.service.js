@@ -1,5 +1,30 @@
-import { ForumPost, ForumVote, ForumBookmark, ForumReport, ForumSetting, User, Staff, Admin } from '@/models'
+import { ForumPost, ForumVote, ForumBookmark, ForumReport, ForumSetting, ForumTag, User, Staff, Admin } from '@/models'
 import { auditLog } from '@/app/services/forum-admin.service'
+import NotificationService from '@/app/services/notification.service.js'
+
+// Push a notification about a new pending report to every active Staff + Admin
+// so they see it in their notification SSE stream right away.
+const notifyModerators = async ({ title, description, metadata }) => {
+    try {
+        const [staffList, adminList] = await Promise.all([
+            Staff.find({ deleted: false }).select('_id'),
+            Admin.find({ deleted: false }).select('_id'),
+        ])
+        const recipients = [...staffList, ...adminList]
+        await Promise.all(
+            recipients.map((mod) =>
+                NotificationService.createAndPush(mod._id, {
+                    title,
+                    description,
+                    type: 'system',
+                    metadata,
+                }).catch(() => {})
+            )
+        )
+    } catch (e) {
+        // notification failure must never block the original action
+    }
+}
 
 // Lookup authors across User / Staff / Admin collections in a single round-trip per type,
 // then return a Map keyed by string(id) → {_id, name, avatar, email, account_type}
@@ -54,22 +79,24 @@ class ForumPostService {
     async createPost(accountId, body, accountType = 'User') {
         const images = Array.isArray(body.images) ? body.images : []
 
-        // Apply settings: auto-approve Mentor/Staff/Admin posts when enabled;
-        // anything else stays PENDING when autoApprove is off.
         let setting = null
         try {
             setting = await ForumSetting.findOne({ scope: 'forum' })
         } catch (e) { /* ignore */ }
+        // Staff/Admin can be auto-approved via the autoApproveMentors toggle.
+        // Regular Users ALWAYS go through staff approval — this is a product
+        // requirement, not a configurable behaviour, so we hardcode it.
         const autoApproveMentors = setting ? setting.autoApproveMentors : true
 
-        let status = 'APPROVED'
-        if (accountType === 'User') {
-            // Default for regular candidates remains APPROVED (the historical default);
-            // moderators can later toggle this by adding a per-role gate in settings.
-            status = 'APPROVED'
-        } else if (accountType === 'Staff' || accountType === 'Admin') {
+        let status
+        if (accountType === 'Staff' || accountType === 'Admin') {
             status = autoApproveMentors ? 'APPROVED' : 'PENDING'
+        } else {
+            // accountType === 'User' (or anything else) → must be reviewed.
+            status = 'PENDING'
         }
+
+        console.log('[forum.createPost] accountType=%s → status=%s', accountType, status)
 
         // Banned words filter
         const banned = (setting?.bannedWords || []).filter(Boolean)
@@ -106,6 +133,15 @@ class ForumPostService {
             targetLabel: post.title?.slice(0, 80),
             status: status === 'PENDING' ? 'warning' : 'success',
         })
+
+        // Tell staff/admin there is a new pending post in the moderation queue.
+        if (status === 'PENDING') {
+            await notifyModerators({
+                title: '📝 Bài viết mới chờ duyệt',
+                description: `Có bài viết "${post.title?.slice(0, 80) || ''}" cần kiểm duyệt.`,
+                metadata: { postId: String(post._id), kind: 'pending_post' },
+            })
+        }
 
         return post
     }
@@ -314,12 +350,31 @@ class ForumPostService {
             throw new Error('Bạn đã báo cáo bài viết này')
         }
 
-        return await ForumReport.create({
+        const report = await ForumReport.create({
             post_id: postId,
             reporter_id: accountId,
             reason: body.reason,
             details: body.details || '',
         })
+
+        await auditLog({
+            actor: { id: accountId, type: 'User' },
+            action: 'report_create',
+            actionLabel: 'Báo cáo bài viết',
+            targetType: 'ForumPost',
+            targetId: post._id,
+            targetLabel: post.title?.slice(0, 80) || `Bài viết #${post._id}`,
+            status: 'warning',
+            metadata: { reason: body.reason, details: body.details || '' },
+        })
+
+        await notifyModerators({
+            title: '⚠️ Có báo cáo bài viết mới',
+            description: `Bài viết "${post.title?.slice(0, 80) || ''}" vừa bị báo cáo (lý do: ${body.reason || 'không rõ'}).`,
+            metadata: { reportId: String(report._id), postId: String(post._id), kind: 'pending_report' },
+        })
+
+        return report
     }
 
     async markResolved(accountId, postId, isResolved) {
@@ -364,6 +419,18 @@ class ForumPostService {
             { $project: { _id: 0, tag: '$_id', count: 1 } },
         ])
         return result
+    }
+
+    // Tag được Staff/Admin tạo trong "Quản lý Tag" + đang ở status='active'.
+    // Trả về tối thiểu cho dropdown soạn bài (name + color).
+    async getActiveTags() {
+        const tags = await ForumTag.find({ status: 'active' }).sort({ name: 1 }).lean()
+        return tags.map((t) => ({
+            _id: String(t._id),
+            name: t.name,
+            color: t.color || 'blue',
+            description: t.description || '',
+        }))
     }
 }
 

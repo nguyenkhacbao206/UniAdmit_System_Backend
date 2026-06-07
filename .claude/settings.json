@@ -30,10 +30,44 @@
       "Bash(node \"d:/tmp/ctrl2.js\")",
       "Bash(grep -rnE \"<Avatar|\\\\\\\\.avatar\" src/pages/User/HoSo src/pages/User/TrangChu)",
       "Bash(grep -nE \"<Avatar src=\\\\\\\\{\\(post|comment|reply|currentUser|m\\)\\\\\\\\.\\\\\\\\w+\\\\\\\\.avatar|<Avatar src=\\\\\\\\{currentUser\\\\\\\\.avatar\" src/pages/Forum/components/PostCard.tsx src/pages/Forum/components/CommentSection.tsx src/pages/Forum/PostDetail/index.tsx src/pages/Forum/components/ForumSidebar.tsx)",
-      "Bash(node \"d:/tmp/initial-avatars.js\")"
+      "Bash(node \"d:/tmp/initial-avatars.js\")",
+      "Bash(ls -la .env*)",
+      "Bash(cat .env)",
+      "Bash(cat src/handlers/cors.handler.js)",
+      "Bash(grep -E \"URL_CLIENT|OTHER_URLS|HOST|PORT\" .env)",
+      "Bash(grep -E \"^export.*\\\\\\\\b\\(useParams|useLocation\\)\\\\\\\\b\" node_modules/umi/dist/index.d.ts)",
+      "Bash(npx max *)",
+      "Bash(curl -sS http://localhost:8082/staff/forum/reports -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(netstat -ano)",
+      "Bash(docker compose *)",
+      "Bash(yarn start *)",
+      "Bash(curl -sS http://localhost:8082/user/forum/trending -m 3 -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(nslookup _mongodb._tcp.cluster0.tr3y9tf.mongodb.net 8.8.8.8)",
+      "Bash(nslookup cluster0.tr3y9tf.mongodb.net 8.8.8.8)",
+      "Bash(nslookup -type=SRV _mongodb._tcp.cluster0.tr3y9tf.mongodb.net 8.8.8.8)",
+      "Bash(curl -sS http://localhost:8082/user/forum/trending -m 3 -w \"\\\\nHTTP:%{http_code}\\\\n\")",
+      "Bash(npx babel-node *)",
+      "Bash(curl -sS http://localhost:8082/staff/forum/posts/pending -m 4 -w \"\\\\nHTTP:%{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/staff/forum/reports -m 4 -w \"\\\\nHTTP:%{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/staff/forum/posts/pending -m 3 -w \"\\\\nHTTP:%{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8082/user/forum/active-tags -m 4 -w \"\\\\nHTTP:%{http_code}\\\\n\")",
+      "Bash(cd \"d:/UniAdmit-System-Frontend\" && sed -i '200,294d' \"src/pages/Forum/PostDetail/index.tsx\" && grep -n \"isPhone ? \\(\" src/pages/Forum/PostDetail/index.tsx | head -5)",
+      "Bash(curl -sS http://localhost:8082/user/account/preferences -m 4 -w \"\\\\nHTTP:%{http_code}\\\\n\")",
+      "Bash(ps -W)",
+      "Bash(curl -sS http://localhost:8082/user/forum/trending -m 4 -w \"\\\\nHTTP:%{http_code}\\\\n\")",
+      "Bash(powershell -Command \"Get-Process -Name node -ErrorAction SilentlyContinue | Stop-Process -Force; Start-Sleep -s 1; Write-Output 'killed'\")",
+      "Bash(curl -sS -X POST http://localhost:8082/user/account/change-password -m 4 -w \"\\\\nHTTP:%{http_code}\\\\n\")",
+      "Bash(curl -sS -X PATCH http://localhost:8082/user/account/language -m 4 -w \"\\\\nHTTP:%{http_code}\\\\n\")",
+      "Bash(powershell -Command \"Stop-Process -Id 25224 -Force -ErrorAction SilentlyContinue; Get-Process -Name node -ErrorAction SilentlyContinue | Stop-Process -Force; Start-Sleep -s 2; Write-Output 'killed'\")",
+      "Bash(curl -sS http://localhost:8082/user/forum/trending -m 2 -o /dev/null)",
+      "Bash(curl -sS http://localhost:8083/user/forum/trending -m 4 -w \"\\\\nHTTP:%{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8083/user/account/preferences -m 4 -w \"\\\\nHTTP:%{http_code}\\\\n\")",
+      "Bash(curl -sS -X PATCH http://localhost:8083/user/account/language -m 4 -w \"\\\\nHTTP:%{http_code}\\\\n\")",
+      "Bash(curl -sS http://localhost:8083/user/account/preferences -m 3 -w \"\\\\nHTTP:%{http_code}\\\\n\")"
     ],
     "additionalDirectories": [
-      "d:\\tmp"
+      "d:\\tmp",
+      "d:\\UniAdmit-System-Frontend\\src\\pages\\Forum\\PostDetail"
     ]
   }
 }

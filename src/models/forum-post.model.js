@@ -48,7 +48,7 @@ const ForumPost = createModel(
         status: {
             type: String,
             enum: ['PENDING', 'APPROVED', 'REJECTED'],
-            default: 'APPROVED',
+            default: 'PENDING',
         },
 
         is_resolved: {
