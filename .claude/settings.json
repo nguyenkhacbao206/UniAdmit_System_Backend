@@ -63,11 +63,37 @@
       "Bash(curl -sS http://localhost:8083/user/forum/trending -m 4 -w \"\\\\nHTTP:%{http_code}\\\\n\")",
       "Bash(curl -sS http://localhost:8083/user/account/preferences -m 4 -w \"\\\\nHTTP:%{http_code}\\\\n\")",
       "Bash(curl -sS -X PATCH http://localhost:8083/user/account/language -m 4 -w \"\\\\nHTTP:%{http_code}\\\\n\")",
-      "Bash(curl -sS http://localhost:8083/user/account/preferences -m 3 -w \"\\\\nHTTP:%{http_code}\\\\n\")"
+      "Bash(curl -sS http://localhost:8083/user/account/preferences -m 3 -w \"\\\\nHTTP:%{http_code}\\\\n\")",
+      "Bash(curl -sS https://eloquent-sundae-135fe1.netlify.app/ -m 10 -o /tmp/index.html -w \"HTTP:%{http_code}\\\\nSize:%{size_download}\\\\n\")",
+      "Bash(cat /tmp/index.html 2>&1 | head -40)",
+      "Read(//tmp/**)",
+      "Bash(curl -sS https://eloquent-sundae-135fe1.netlify.app/_redirects -m 5 -w \"\\\\nHTTP:%{http_code}\\\\n\")",
+      "Bash(curl -sS -I https://eloquent-sundae-135fe1.netlify.app/umi.713d16f7.js -m 5)",
+      "Bash(curl -sS https://eloquent-sundae-135fe1.netlify.app/user/login -m 5 -w \"\\\\nHTTP:%{http_code}\\\\nSize:%{size_download}\\\\n\" -o /tmp/login.html)",
+      "Bash(curl -sSL https://eloquent-sundae-135fe1.netlify.app/user/login -m 8 -w \"\\\\nHTTP:%{http_code}\\\\nSize:%{size_download}\\\\n\" -o /tmp/login.html)",
+      "Bash(curl -sS https://eloquent-sundae-135fe1.netlify.app/umi.713d16f7.js -m 30 -o /tmp/bundle.js)",
+      "Bash(grep -oE \"https://[a-zA-Z0-9.-]+\" /tmp/bundle.js 2>/dev/null | sort -u | head -20)",
+      "Bash(grep -oE \"https://[a-zA-Z0-9.-]+\" /tmp/bundle.js 2>/dev/null | sort -u | grep -E \"render|netlify|backend|uniadmit\")",
+      "Bash(curl -sS https://uniadmit-system-backend.onrender.com/user/forum/trending -m 15 -w \"\\\\nHTTP:%{http_code}\\\\nTime:%{time_total}s\\\\n\" -o /tmp/be.json)",
+      "Bash(curl -sS https://uniadmit-system-backend.onrender.com/user/forum/trending -m 90 -w \"\\\\nHTTP:%{http_code}\\\\nTime:%{time_total}s\\\\n\" -o /tmp/be2.json)",
+      "Bash(curl -sS https://eloquent-sundae-135fe1.netlify.app/ -m 10 -o /tmp/index2.html)",
+      "Bash(curl -sS https://eloquent-sundae-135fe1.netlify.app/umi.ff6aaf23.js -m 30 -o /tmp/bundle2.js)",
+      "Bash(curl -sS https://uniadmit-system-backend.onrender.com/user/forum/trending -m 30 -w \"\\\\nHTTP:%{http_code}\\\\nTime:%{time_total}s\\\\n\" -o /tmp/be3.json)",
+      "Bash(curl -sS https://eloquent-sundae-135fe1.netlify.app/ -m 10 -o /tmp/idx3.html)",
+      "Bash(curl -sS https://eloquent-sundae-135fe1.netlify.app/ -m 5 -o /tmp/idx4.html)",
+      "Bash(curl -sS https://eloquent-sundae-135fe1.netlify.app/index.html -m 5 -o /tmp/idx5.html)",
+      "Bash(grep -n \"Object.keys\\\\|Object\\\\\\\\.values\\\\\\\\|Object\\\\\\\\.entries\" \"d:/UniAdmit-System-Frontend/src/components/RightContent/Header.tsx\" \"d:/UniAdmit-System-Frontend/src/components/RightContent/index.tsx\" \"d:/UniAdmit-System-Frontend/src/components/RightContent/AvatarDropdown.tsx\")",
+      "Bash(curl -sS https://eloquent-sundae-135fe1.netlify.app/umi.20ca81b8.js -m 30 -o /tmp/bundle3.js)",
+      "Bash(cut -c2412150-2412400 /tmp/bundle2.js 2>&1)",
+      "Bash(grep -oE \".{50}Object.keys\\\\\\\\\\(.{0,50}\" /tmp/bundle2.js 2>&1 | head -20)",
+      "Bash(awk -v BIN_MODE=1 'BEGIN{getline content < \"/tmp/bundle2.js\"; close\\(\"/tmp/bundle2.js\"\\); start=2412000; while\\(start<2412300\\){i=index\\(substr\\(content, start, 500\\), \"Object.keys\"\\); if\\(i>0\\){print start+i-1, substr\\(content,start+i-100,200\\); break}; start+=200}}')",
+      "Bash(python -c ' *)",
+      "Bash(cp /tmp/bundle2.js \"d:/UniAdmit-System-Frontend/tmp_bundle.js\" 2>&1; ls -la \"d:/UniAdmit-System-Frontend/tmp_bundle.js\" 2>&1 | head -2)"
     ],
     "additionalDirectories": [
       "d:\\tmp",
-      "d:\\UniAdmit-System-Frontend\\src\\pages\\Forum\\PostDetail"
+      "d:\\UniAdmit-System-Frontend\\src\\pages\\Forum\\PostDetail",
+      "\\tmp"
     ]
   }
 }

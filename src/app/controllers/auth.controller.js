@@ -5,38 +5,47 @@ import { abort } from '@/utils/helpers'
 export async function loginUniversal(req, res) {
     const loginResult = await authService.universalLogin(req.body)
 
-    // --- TẮT OTP ĐĂNG NHẬP ĐỂ TEST (bật lại khi demo) ---
-    // if (loginResult.requires_otp) {
-    //     const user = loginResult.user
-    //     res.sendMail(user.email, `[${APP_NAME}] Xác thực đăng nhập`, 'emails/login-otp', {
-    //         name: user.name,
-    //         otp: user.otp,
-    //         appName: APP_NAME
-    //     })
-    //     res.jsonify({
-    //         requires_otp: true,
-    //         account_type: 'user',
-    //         email: user.email,
-    //         message: 'Vui lòng kiểm tra email để lấy mã xác thực đăng nhập.',
-    //     })
-    //     return
-    // }
+    // User branch: yêu cầu OTP. Admin/Staff đi thẳng xuống cấp token.
+    if (loginResult.requires_otp) {
+        const user = loginResult.user
+        const isUnverified = !!loginResult.requires_verify
 
-    // Lưu refresh token vào cookie (httpOnly)
+        const template = isUnverified ? 'emails/verify-otp' : 'emails/login-otp'
+        const subject = isUnverified
+            ? `[${APP_NAME}] Xác thực tài khoản`
+            : `[${APP_NAME}] Xác thực đăng nhập`
+
+        res.sendMail(user.email, subject, template, {
+            name: user.name,
+            otp: user.otp,
+            appName: APP_NAME,
+        })
+
+        res.jsonify({
+            requires_otp: true,
+            ...(isUnverified && { requires_verify: true }),
+            account_type: 'user',
+            email: user.email,
+        }, isUnverified
+            ? 'Tài khoản chưa được xác thực. Mã OTP đã được gửi đến email của bạn.'
+            : 'Vui lòng kiểm tra email để lấy mã xác thực đăng nhập.')
+        return
+    }
+
+    // Admin / Staff: cấp token ngay, không qua OTP.
     res.cookie('refreshToken', loginResult.tokenData.refresh_token, {
         httpOnly: true,
-        secure: false, // dev thì false, production -> true
+        secure: false,
         sameSite: 'Lax',
         maxAge: 7 * 24 * 60 * 60 * 1000,
     })
 
-    // Trả access token & roles phân hướng
     res.jsonify({
         access_token: loginResult.tokenData.access_token,
         expire_in: loginResult.tokenData.expire_in,
         auth_type: loginResult.tokenData.auth_type,
         roles: loginResult.roles,
-        account_type: loginResult.account_type
+        account_type: loginResult.account_type,
     })
 }
 

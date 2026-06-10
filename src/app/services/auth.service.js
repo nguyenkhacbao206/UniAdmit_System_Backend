@@ -128,16 +128,15 @@ export async function universalLogin({ identifier, username, password }) {
         if (!user.verifyPassword(password)) abort(400, 'Tài khoản hoặc mật khẩu không đúng.')
         if (user.status === STATUS_ACCOUNT.INACTIVE) abort(400, 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản lý.')
 
-        // await updateOTP(user)
+        // Bật lại OTP: user phải xác nhận mã trong email mới được cấp token.
+        // Sinh OTP mới + lưu vào DB rồi controller sẽ gửi mail.
+        await updateOTP(user)
 
-        // if (user.status === STATUS_ACCOUNT.UNVERIFIED) {
-        //     return { user, roles: ['user'], account_type: 'user', requires_otp: true, requires_verify: true }
-        // }
+        if (user.status === STATUS_ACCOUNT.UNVERIFIED) {
+            return { user, roles: ['user'], account_type: 'user', requires_otp: true, requires_verify: true }
+        }
 
-        // return { user, roles: ['user'], account_type: 'user', requires_otp: true }
-
-        const tokenData = authTokenUser(user)
-        return { user, tokenData, roles: ['user'], account_type: 'user' }
+        return { user, roles: ['user'], account_type: 'user', requires_otp: true }
     }
 
     abort(400, 'Tài khoản hoặc mật khẩu không đúng.')

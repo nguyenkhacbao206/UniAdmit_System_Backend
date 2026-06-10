@@ -6,50 +6,32 @@ import * as authService from '@/app/services/auth.service'
 export async function login(req, res) {
     const user = await authService.checkValidLoginUser(req.body)
 
-    // --- TẮT OTP ĐỂ TEST (bật lại khi demo) ---
-    // if (user) {
-    //     await authService.updateOTP(user)
-    //     const isUnverified = user.status === 'UNVERIFIED'
-    //
-    //     const template = isUnverified ? 'emails/verify-otp' : 'emails/login-otp'
-    //     const subject = isUnverified
-    //         ? `[${APP_NAME}] Xác thực tài khoản`
-    //         : `[${APP_NAME}] Xác thực đăng nhập`
-    //
-    //     res.sendMail(user.email, subject, template, {
-    //         name: user.name,
-    //         otp: user.otp,
-    //         appName: APP_NAME
-    //     })
-    //
-    //     res.jsonify({
-    //         requires_otp: true,
-    //         ...(isUnverified && { requires_verify: true }),
-    //         message: isUnverified
-    //             ? 'Tài khoản chưa được xác thực. Mã OTP đã được gửi đến email của bạn.'
-    //             : 'Vui lòng kiểm tra email để lấy mã xác thực đăng nhập.',
-    //         email: user.email
-    //     })
-    // } else {
-    //     abort(400, 'Tài khoản hoặc mật khẩu không đúng.')
-    // }
+    if (!user) abort(400, 'Tài khoản hoặc mật khẩu không đúng.')
 
-    if (user) {
-        const tokenData = authService.authTokenUser(user)
-        res.cookie('refreshToken', tokenData.refresh_token, {
-            httpOnly: true,
-            secure: false,
-            sameSite: 'Lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        })
-        res.jsonify({
-            access_token: tokenData.access_token,
-            expire_in: tokenData.expire_in,
-            auth_type: tokenData.auth_type,
-        }, 'Đăng nhập thành công.')
-    } else {
-        abort(400, 'Tài khoản hoặc mật khẩu không đúng.')
-    }
+    // Sinh OTP mới + gửi mail. User PHẢI nhập OTP đúng ở bước verifyLoginOTP
+    // mới được cấp access token. Account chưa verify thì cùng flow, chỉ khác
+    // template + subject email.
+    await authService.updateOTP(user)
+    const isUnverified = user.status === 'UNVERIFIED'
+
+    const template = isUnverified ? 'emails/verify-otp' : 'emails/login-otp'
+    const subject = isUnverified
+        ? `[${APP_NAME}] Xác thực tài khoản`
+        : `[${APP_NAME}] Xác thực đăng nhập`
+
+    res.sendMail(user.email, subject, template, {
+        name: user.name,
+        otp: user.otp,
+        appName: APP_NAME,
+    })
+
+    res.jsonify({
+        requires_otp: true,
+        ...(isUnverified && { requires_verify: true }),
+        email: user.email,
+    }, isUnverified
+        ? 'Tài khoản chưa được xác thực. Mã OTP đã được gửi đến email của bạn.'
+        : 'Vui lòng kiểm tra email để lấy mã xác thực đăng nhập.')
 }
 
 export async function verifyLoginOTP(req, res) {
